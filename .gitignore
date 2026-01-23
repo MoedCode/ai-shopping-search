@@ -1,5 +1,8 @@
 # Dependencies
-db.env.sh
+# Environment files
+**/db.env.sh
+**/create_db.sql
+
 node_modules/
 /frontend/node_modules
 /frontend/.next/
