@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Local Apps
+    'common',
     'search',
     'accounts',  # New
     'chat'

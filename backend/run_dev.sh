@@ -4,7 +4,7 @@
 # Django Dev Runner
 # ===============================
 
-ENV_FILE=${1:-db.env.sh}
+ENV_FILE=${1:.env}
 HOST=${2:-0.0.0.0}
 PORT=${3:-8000}
 GITIGNORE=".gitignore"

@@ -1,6 +1,6 @@
 # Dependencies
 # Environment files
-**/db.env.sh
+**/.env
 **/create_db.sql
 
 node_modules/

@@ -16,7 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from chat.views import CreateGuestView, GuestChatView
+from search.views import GuestSearchView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Guest API endpoints
+    path('create/guest', CreateGuestView.as_view(), name='create-guest'),
+    path('chat/guest', GuestChatView.as_view(), name='guest-chat'),
+    path('search/guest', GuestSearchView.as_view(), name='guest-search'),
 ]
