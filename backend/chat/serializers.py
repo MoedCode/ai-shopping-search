@@ -1,19 +1,18 @@
 from rest_framework import serializers
-from .models import Guest, GuestChat
+from .models import GuestChat
 
 
-class GuestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Guest
-        fields = ['guest_id', 'created_at', 'last_activity']
-        read_only_fields = ['guest_id', 'created_at', 'last_activity']
+
 
 
 class GuestChatSerializer(serializers.ModelSerializer):
+    guest_id = serializers.UUIDField(source='guest.id', read_only=True)
+
     class Meta:
         model = GuestChat
-        fields = ['id', 'guest', 'message', 'response', 'created_at']
-        read_only_fields = ['id', 'created_at']
-    
+        fields = ['id', 'guest_id', 'message', 'response', 'created_at']
+        read_only_fields = ['id', 'created_at', 'guest_id']
+
     def create(self, validated_data):
+        # creation is handled in the view (we expect a Guest instance there)
         return GuestChat.objects.create(**validated_data)

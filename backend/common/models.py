@@ -13,3 +13,14 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Guest(BaseModel):
+    """Store guest sessions with unique identifiers"""
+    last_activity = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Guest {self.id}"

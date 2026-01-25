@@ -1,29 +1,28 @@
-// src/services/api.js
-import axios from 'axios';
+import axios from 'axios'
+import { getGuestId } from './guest'
 
-// عنوان الباك إند (تأكد إنه نفس بورت جانغو)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-const apiClient = axios.create({
-    baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+const client = axios.create({ baseURL: API_URL })
 
-export const chatService = {
-  // دالة إرسال الرسالة
-  sendMessage: async (message, history = []) => {
-    try {
-      // Endpoint: /shopping-chat/ (تأكد من الاسم في urls.py عندك)
-      const response = await apiClient.post('/shopping-chat/', {
-        query: message,
-        history: history
-      });
-      return response.data;
-    } catch (error) {
-      console.error("API Error:", error);
-      throw error; // بنرمي الخطأ عشان الواجهة تتعامل معاه
-    }
-  }
-};
+client.interceptors.request.use(async (cfg) => {
+  const guestId = await getGuestId()
+  if (guestId) cfg.headers['X-Guest-Id'] = guestId
+  return cfg
+})
+
+const CHAT_ENDPOINT = '/chat/guest'
+
+export const fetchChatHistory = async (guestId) => {
+  return client.get(CHAT_ENDPOINT, { params: { guest_id: guestId } })
+}
+
+export const sendChatMessage = async (guestId, message) => {
+  return client.post(CHAT_ENDPOINT, { guest_id: guestId, message })
+}
+
+export const deleteChatHistory = async (guestId) => {
+  return client.delete(CHAT_ENDPOINT, { data: { guest_id: guestId } })
+}
+
+export default client

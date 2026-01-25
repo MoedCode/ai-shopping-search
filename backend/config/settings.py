@@ -61,8 +61,15 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+from corsheaders.defaults import default_headers
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+]
+
+# allow custom headers used by the frontend (X-Guest-Id)
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-guest-id',
 ]
 TEMPLATES = [
     {
