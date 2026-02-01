@@ -1,18 +1,15 @@
+# ai-shopping-search/backend/chat/serializers.py
 from rest_framework import serializers
-from .models import GuestChat
+from .models import ChatSession, ChatMessage
 
+class ChatMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatMessage
+        fields = ['id', 'role', 'content', 'metadata', 'created_at']
 
-
-
-
-class GuestChatSerializer(serializers.ModelSerializer):
-    guest_id = serializers.UUIDField(source='guest.id', read_only=True)
+class ChatSessionSerializer(serializers.ModelSerializer):
+    messages = ChatMessageSerializer(many=True, read_only=True)
 
     class Meta:
-        model = GuestChat
-        fields = ['id', 'guest_id', 'message', 'response', 'created_at']
-        read_only_fields = ['id', 'created_at', 'guest_id']
-
-    def create(self, validated_data):
-        # creation is handled in the view (we expect a Guest instance there)
-        return GuestChat.objects.create(**validated_data)
+        model = ChatSession
+        fields = ['id', 'title', 'created_at', 'messages']

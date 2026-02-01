@@ -1,3 +1,4 @@
+// ai-shopping-search/frontend/src/components/Footer.jsx
 import React from 'react'
 
 function IconGitHub(props) {

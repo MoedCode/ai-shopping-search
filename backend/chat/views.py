@@ -1,102 +1,92 @@
+#ai-shopping-search/backend/chat/views.py
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from common.models import Guest
-from .models import GuestChat
-from common.serializers import GuestSerializer
-from .serializers import GuestChatSerializer
+from django.contrib.auth import get_user_model
+from .models import ChatSession, ChatMessage
+from .serializers import ChatMessageSerializer, ChatSessionSerializer
+from .utils import query_algolia_agent
 
+User = get_user_model()
 
-def _get_or_create_guest_from_request(request, create_if_missing=False):
-    """Try to locate Guest from request in this order:
-    - request.data['guest_id']
-    - request.query_params['guest_id']
-    - request.COOKIES['guest_id']
-    - Header 'X-Guest-Id'
-
-    Returns tuple (guest_instance or None, created_bool)
+class ChatView(APIView):
     """
-    guest_id = (
-        request.data.get('guest_id') if hasattr(request, 'data') else None
-    ) or request.query_params.get('guest_id') or request.COOKIES.get('guest_id') or request.headers.get('X-Guest-Id')
-
-    if guest_id:
-        try:
-            return Guest.objects.get(id=guest_id), False
-        except Guest.DoesNotExist:
-            # fallthrough: create only if requested
-            if not create_if_missing:
-                return None, False
-
-    if create_if_missing:
-        g = Guest.objects.create()
-        return g, True
-
-    return None, False
-
-
-class CreateGuestView(APIView):
-    """Create a new guest session and return guest_id"""
-
-    def post(self, request):
-        guest = Guest.objects.create()
-        serializer = GuestSerializer(guest)
-        resp = Response(serializer.data, status=status.HTTP_201_CREATED)
-        # set cookie so frontend can persist guest_id
-        resp.set_cookie('guest_id', str(guest.id), httponly=False, samesite='Lax', max_age=60 * 60 * 24 * 365)
-        return resp
-
-
-class GuestChatView(APIView):
-    """Combined view to GET/POST/DELETE guest chats.
-
-    GET:  /chat/guest?guest_id=<uuid>  -> list chats
-    POST: /chat/guest  { guest_id?, message, response? } -> create chat (creates guest if missing and returns cookie)
-    DELETE: /chat/guest  { guest_id?, chat_id? } -> delete a specific chat (chat_id) OR delete all chats for guest if chat_id omitted
+    API for handling chat messages with Algolia Agent.
     """
 
-    def get(self, request):
-        guest, _ = _get_or_create_guest_from_request(request, create_if_missing=False)
-        if not guest:
-            return Response({'error': 'guest_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    def get_user_from_request(self, request):
+        """
+        Helper to get Real User OR Guest User based on header/data
+        """
+        if request.user.is_authenticated:
+            return request.user
 
-        chats = guest.chat_messages.all()
-        serializer = GuestChatSerializer(chats, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # For guests: look for guest_id coming from frontend
+        # The frontend sends guest_id which maps to username in our new system
+        guest_username = request.data.get('guest_id') or request.headers.get('X-Guest-Id')
+
+        if guest_username:
+            # Try to find the existing guest or create a new record
+            user, created = User.objects.get_or_create(
+                username=guest_username,
+                defaults={'is_guest': True} # The Manager will handle the rest of defaults
+            )
+            return user
+
+        # If no identifier found, create a brand new guest
+        return User.objects.create_guest()
 
     def post(self, request):
-        # allow creating guest automatically if frontend didn't have one
-        guest, created = _get_or_create_guest_from_request(request, create_if_missing=True)
+        user = self.get_user_from_request(request)
 
-        message = request.data.get('message')
-        response_text = request.data.get('response', None)
+        message_text = request.data.get('message')
+        session_id = request.data.get('session_id')
 
-        if not message:
-            return Response({'error': 'message is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not message_text:
+            return Response({"error": "Message is required"}, status=400)
 
-        guest_chat = GuestChat.objects.create(guest=guest, message=message, response=response_text)
-        serializer = GuestChatSerializer(guest_chat)
-        resp = Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if created:
-            resp.set_cookie('guest_id', str(guest.id), httponly=False, samesite='Lax', max_age=60 * 60 * 24 * 365)
-
-        return resp
-
-    def delete(self, request):
-        guest, _ = _get_or_create_guest_from_request(request, create_if_missing=False)
-        if not guest:
-            return Response({'error': 'guest_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        chat_id = request.data.get('chat_id') or request.query_params.get('chat_id')
-        if chat_id:
+        # 1. Session Management
+        if session_id:
             try:
-                chat = GuestChat.objects.get(id=chat_id, guest=guest)
-                chat.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            except GuestChat.DoesNotExist:
-                return Response({'error': 'Chat not found'}, status=status.HTTP_404_NOT_FOUND)
+                session = ChatSession.objects.get(id=session_id, user=user)
+            except ChatSession.DoesNotExist:
+                session = ChatSession.objects.create(user=user, title=message_text[:30])
+        else:
+            session = ChatSession.objects.create(user=user, title=message_text[:30])
 
-        # no chat_id provided => delete all guest chats
-        guest.chat_messages.all().delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        # 2. Save User Message
+        ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.USER,
+            content=message_text
+        )
+
+        # 3. Send to Algolia
+        algolia_response = query_algolia_agent(message_text, session.id)
+
+        # 4. Process Response
+        ai_content = "Sorry, I couldn't reach the shopping agent right now."
+        products = []
+
+        if algolia_response:
+            # Adapt keys based on actual Algolia response structure
+            ai_content = algolia_response.get('answer', ai_content)
+            products = algolia_response.get('hits', [])
+
+        # 5. Save AI Response
+        agent_msg = ChatMessage.objects.create(
+            session=session,
+            role=ChatMessage.Role.ASSISTANT,
+            content=ai_content,
+            metadata={"products": products} if products else None
+        )
+
+        # 6. Return Response
+        return Response({
+            "session_id": session.id,
+            "guest_id": user.username, # Important for frontend to persist
+            "message": agent_msg.content,
+            "products": products,
+            "created_at": agent_msg.created_at
+        })

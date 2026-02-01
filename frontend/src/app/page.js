@@ -1,4 +1,5 @@
-// src/app/page.js
+// ai-shopping-search/frontend/src/app/page.js
+
 import ChatInterface from '../components/ChatInterface';
 import Footer from '../components/Footer';
 export default function Home() {

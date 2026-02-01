@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
     # Local Apps
     'common',
-    'search',
+    # 'search',
     'accounts',  # New
     'chat'
 ]
@@ -144,3 +144,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ALGOLIA_APP_ID = os.getenv('ALGOLIA_APP_ID')
+ALGOLIA_API_KEY = os.getenv('ALGOLIA_API_KEY')
+ALGOLIA_AGENT_ID = os.getenv('ALGOLIA_AGENT_ID')
+ALGOLIA_AGENT_URL = os.getenv('ALGOLIA_AGENT_URL')

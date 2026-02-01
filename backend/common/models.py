@@ -1,5 +1,9 @@
+#ai-shopping-search/backend/common/models.py
 from django.db import models
 import uuid
+from django.contrib.auth.models import (
+    AbstractBaseUser, PermissionsMixin, BaseUserManager
+)
 
 
 class BaseModel(models.Model):
@@ -15,12 +19,5 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Guest(BaseModel):
-    """Store guest sessions with unique identifiers"""
-    last_activity = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        ordering = ['-created_at']
 
-    def __str__(self):
-        return f"Guest {self.id}"

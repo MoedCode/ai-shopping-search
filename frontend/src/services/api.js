@@ -1,3 +1,4 @@
+// ai-shopping-search/frontend/src/services/api.js
 import axios from 'axios'
 import { getGuestId } from './guest'
 

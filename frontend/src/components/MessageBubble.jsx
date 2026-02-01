@@ -1,4 +1,4 @@
-// src/components/MessageBubble.jsx
+// ai-shopping-search/frontend/src/components/MessageBubble.jsx
 'use client';
 
 // التغيير الأساسي هنا: غيرنا { message } إلى { text } ليطابق البيانات القادمة

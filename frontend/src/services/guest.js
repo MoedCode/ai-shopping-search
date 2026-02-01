@@ -1,3 +1,4 @@
+// ai-shopping-search/frontend/src/services/guest.js
 export const GUEST_KEY = 'guest_id'
 
 export function getGuestIdFromCookie() {

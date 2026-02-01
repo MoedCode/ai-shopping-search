@@ -1,3 +1,4 @@
+#ai-shopping-search/backend/chat/apps.py
 from django.apps import AppConfig
 
 

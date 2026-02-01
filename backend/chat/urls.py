@@ -1,3 +1,4 @@
+#ai-shopping-search/backend/chat/urls.py
 from django.urls import path, include
 
 from chat.views import CreateGuestView, GuestChatView
