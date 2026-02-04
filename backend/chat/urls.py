@@ -1,9 +1,7 @@
 #ai-shopping-search/backend/chat/urls.py
-from django.urls import path, include
+from django.urls import path
+from .views import ChatView
 
-from chat.views import CreateGuestView, GuestChatView
 urlpatterns = [
-    path('guest/create', CreateGuestView.as_view(), name='create-guest'),
-    path('guest', GuestChatView.as_view(), name='guest-chat'),
-
+    path('session', ChatView.as_view(), name='chat-session'),
 ]
