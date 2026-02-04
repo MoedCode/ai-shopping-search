@@ -204,3 +204,24 @@ again just make it smimple
 
  username = f"guest_{guest_uid}"
 
+ i will walk throw the  scenario ou recominded
+ a weil designed klanding page , with start now  button
+ as defult  user click `with start now` it nextJS make  reqest to create user as  Guest
+ django reoned back creating new user , and return   user guest_id to next  make other reuest with pass to  Django guest then Django create new session , send session id to user ..we dont wanna that
+ 1-we wana start by landing page wen user cick start now just chating UI section get loaded
+
+2- but we can make both Django and nextJS like smart coworkers undestand each other bu signal
+ like waiter tell cheef about meal order repatedly required chees cake .. they both know it will they just signal each other withou talking or say a few words
+ so Django  have end point Creaat/Guest/chat ..lie cheef pepared most of meal allready
+  wait for just to know toping
+ next use this when user cloick start now type his first message ,"before hse send it jsut sotored in local storage or browser cach or RAM . cause message can be long or in browser ram any not the topic now but but in pesudo code in  case of use r accedintaly colse th tap connection stop resotred reoladed it he ind his message do we have petter user experince"
+ when user end it nextjs   send a new message to Creaat/Guest/chat
+ Creaat/Guest/chat create user ..wen take user id to create
+
+make language work rxavlty like wehn i chat to you
+if users  exlictly type language, repond wit hit ..but if they dont
+users  message context in some languagr  responde in same languae even if message contain terms form other language.
+adjust the instruction responsable for diplay porduct to diplay to handle API responses ..
+make it instruction manlu directed for AI reposnes
+make sure that Agent hile using my LLM API key  didnt exced with any way 15 request on LLM
+then tell me do i need to re publish the Agent after that

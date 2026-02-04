@@ -16,10 +16,19 @@ Browser closes stream when server says DONE
 User types message
 User clicks "Send"
 
-Browser opens connection to Next.js
-Browser waits for streamed text
-Browser appends text to UI as it arrives
-Browser closes stream when server says DONE
+Receive message from Browser
+
+Forward message + session_id to Django
+Keep connection open
+
+Wait for streamed response from Django
+
+For each chunk received:
+    Immediately forward chunk to Browser
+
+When stream ends:
+    Close connection with Browser
+
 
 ```
 ## *C* Backend Django
@@ -70,3 +79,4 @@ Send chunks one by one
 
 Send DONE
 ```
+

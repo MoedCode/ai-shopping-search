@@ -94,7 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     # --- Identity Fields ---
     email = models.EmailField(unique=True, db_index=True)
     username = models.CharField(max_length=150, unique=True, db_index=True)
-
+    guest_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     # --- Profile Fields (Nullable for Guests) ---
     first_name = models.CharField(max_length=150, blank=True, null=True)
     last_name = models.CharField(max_length=150, blank=True, null=True)
