@@ -1,5 +1,4 @@
 #ai-shopping-search/backend/chat/views.py
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,25 +6,51 @@ from django.contrib.auth import get_user_model
 from django.http import StreamingHttpResponse
 from django.utils import timezone
 import json
+import uuid
 from .models import ChatSession, ChatMessage
 from .serializers import ChatMessageSerializer, ChatSessionSerializer
 from .utils import query_algolia_streaming
 
 User = get_user_model()
 
+def debug_log_agent_response(session_id, full_answer, hits):
+    """
+    Overwrites 'agent_log.json' with the latest agent response for debugging.
+    """
+    log_data = {
+        "timestamp": str(timezone.now()),
+        "session_id": str(session_id),
+        "agent_response_text": full_answer,
+        "products_hits": hits
+    }
+    
+    try:
+        # 'w' mode ensures the file is overwritten (truncated) every time
+        with open('agent_log.json', 'w', encoding='utf-8') as f:
+            json.dump(log_data, f, indent=4, ensure_ascii=False)
+        print("DEBUG: Agent response dumped to agent_log.json")
+    except Exception as e:
+        print(f"DEBUG ERROR: Failed to write log file: {e}")
 class ChatView(APIView):
-    """GET for retrieving chat history, POST for sending messages to Algolia Agent,
-    DELETE for clearing history."""
+    """
+    API View to handle Chat Sessions and Messages.
+    Supports:
+    - GET: Retrieve chat history.
+    - POST: Send a message (Streaming Response) & Deduplication logic.
+    - DELETE: Clear chat history.
+    """
 
     def get_user(self, request):
         """Helper to get Real User OR Guest User based on header/data"""
         if request.user.is_authenticated:
             return request.user, False
         
-        # For guests: look for guest_id coming from frontend
+        # Priority: Header > Body
         guest_id = request.headers.get('X-Guest-Id') or request.data.get('guest_id')
+        
         if guest_id:
             try:
+                # We assume the frontend stores the 'username' of the guest as the ID
                 user = User.objects.get(username=guest_id, is_guest=True)
                 return user, False
             except User.DoesNotExist:
@@ -36,77 +61,106 @@ class ChatView(APIView):
         return new_guest, True
 
     def post(self, request):
-        """handle thee cases 1- new guest 2-existing guest 3-authenticated user"""
+        """
+        Handle incoming messages.
+        - Creates/Retrieves Session.
+        - Saves User Message (with deduplication support via client_message_id).
+        - Streams back the AI response.
+        """
         content = request.data.get('message', '').strip()
-        # to prevent deduplication later
         client_message_id = request.data.get('client_message_id')
         provided_session_id = request.data.get('session_id')
         
         if not content:
             return Response({"error": "Message content is required"}, status=400)
         
-        # identify get user
+        # 1. Identify User
         user, is_new_user = self.get_user(request)
         session = None
         
+        # 2. Retrieve or Create Session
         if provided_session_id:
             session = ChatSession.objects.filter(id=provided_session_id, user=user).first()
         
         if not session:
+            # Create title from first 50 chars
             session_title = content[:50] + "..." if len(content) > 50 else content
             session = ChatSession.objects.create(user=user, title=session_title)
         
-        # save user message to Ensure not lose it
-        ChatMessage.objects.create(
-            session=session, role=ChatMessage.Role.USER, content=content,
-            status=ChatMessage.Status.COMPLETED, client_message_id=client_message_id
-        )
+        # 3. Validate & Map client_message_id -> external_id
+        # We ensure it is a valid UUID, otherwise we let Django auto-generate one.
+        valid_external_id = None
+        if client_message_id:
+            try:
+                valid_external_id = uuid.UUID(str(client_message_id))
+            except ValueError:
+                pass # Invalid UUID string from frontend; ignore it.
+
+        # 4. Save User Message
+        # Note: We map 'client_message_id' (Frontend) to 'external_id' (Database)
+        user_message_kwargs = {
+            "session": session,
+            "role": ChatMessage.Role.USER,
+            "content": content,
+            "status": ChatMessage.Status.COMPLETED
+        }
         
-        # update session last message time
+        if valid_external_id:
+            # Check for deduplication: If message already exists, don't create new one
+            # This is optional but good practice if frontend retries requests
+            if not ChatMessage.objects.filter(external_id=valid_external_id).exists():
+                 user_message_kwargs["external_id"] = valid_external_id
+                 ChatMessage.objects.create(**user_message_kwargs)
+        else:
+            ChatMessage.objects.create(**user_message_kwargs)
+        
+        # Update session timestamp
         session.last_message_at = timezone.now()
         session.save(update_fields=['last_message_at'])
 
+        # 5. Generator Function for Streaming Response
         def event_stream():
-            # identify Generator (streaming core)
-            # it will save while streaming to frontend
             guest_identifier = user.username if hasattr(user, 'username') else str(user.id)
-            initial_data = { "type": "meta", "guest_id": guest_identifier,
-                             "session_id": str(session.id), "is_new_user": is_new_user }
+            
+            # Send Meta Data first (Frontend needs this to track session/guest)
+            initial_data = { 
+                "type": "meta", 
+                "guest_id": guest_identifier,
+                "session_id": str(session.id), 
+                "is_new_user": is_new_user 
+            }
             yield f"data: {json.dumps(initial_data)}\n\n"
             
-            # will used later to collect full answer save to psql
             full_agent_answer = ""
             collected_hits = []
             
             try:
-                # stablish connection with algolia and pass data
+                # Stream content from Algolia Utils
                 for chunk in query_algolia_streaming(content, session.id):
-                    # decode bytes to string so ChatView can process it
-                    decoded_line = chunk
-                    yield f"{decoded_line}\n\n"
+                    # chunk is already a decoded string from utils
+                    yield f"{chunk}\n\n"
                     
-                    if decoded_line.strip().startswith("data: "):
-                        # extract actual data payload
-                        # we delete "data: " prefix to get pure json
+                    # Accumulate data for saving to DB later
+                    if chunk.strip().startswith("data: "):
                         try:
-                            clean_json = decoded_line.replace("data: ", "").strip()
+                            clean_json = chunk.replace("data: ", "").strip()
                             if clean_json == "[DONE]":
                                 continue
                             data = json.loads(clean_json)
+                            
                             if data.get("type") == "text_delta":
                                 full_agent_answer += data.get("delta", "")
-                            # collect hits "products"
-                            elif data.get("type") == "tool-output-available":
+                            
+                            elif data.get("type") in ["tool-output-available", "tools-output-available"]:
                                 output = data.get("output", {})
-                                full_agent_answer += output.get("text", "")
-                            elif data.get("type") == "tools-output-available":
-                                output = data.get("output", {})
+                                full_agent_answer += output.get("text", "") # Append tool text if any
                                 if "hits" in output:
                                     collected_hits = output["hits"]
                         except json.JSONDecodeError:
                             continue
                 
-                # After streaming is done, save the AI response
+                # 6. Save Assistant Response to DB
+                # Only save if we got something back
                 if full_agent_answer or collected_hits:
                     ChatMessage.objects.create(
                         session=session,
@@ -115,13 +169,16 @@ class ChatView(APIView):
                         metadata={"products": collected_hits},
                         status=ChatMessage.Status.COMPLETED
                     )
+                
+                # Update timestamp again
                 session.last_message_at = timezone.now()
                 session.save(update_fields=['last_message_at'])
+                debug_log_agent_response(session.id, full_agent_answer, collected_hits)
             except Exception as e:
-                # if an error happen while stream send error message tp the front 
+                # Handle Stream Interruptions
                 error_data = {"type": "error", "message": "connection interrupted"}
                 yield f"data: {json.dumps(error_data)}\n\n"
-                # save a filed message tp psql
+                
                 ChatMessage.objects.create(
                     session=session,
                     role=ChatMessage.Role.ASSISTANT,
@@ -129,17 +186,16 @@ class ChatView(APIView):
                     status=ChatMessage.Status.FAILED
                 )
 
+        # 7. Return Streaming Response
         response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
-        response['X-Accel-Buffering'] = 'no'
+        response['X-Accel-Buffering'] = 'no' # Disable Nginx buffering
         response['Cache-Control'] = 'no-cache'
         return response
 
     def get(self, request):
-        """get chat session"""
+        """Retrieve Chat History"""
         user, _ = self.get_user(request)
-        session_id = request.query_params.get('session_id', '')
-        if not session_id:
-            session_id = request.data.get('session_id', '')
+        session_id = request.query_params.get('session_id') or request.data.get('session_id')
         
         if not session_id:
             return Response({"error": "Session ID required"}, status=400)
@@ -152,28 +208,34 @@ class ChatView(APIView):
         except ChatSession.DoesNotExist:
             return Response({"error": "Session not found"}, status=404)
 
-    def get_session(self, request):
-        user, _ = self.get_user(request)
-        session_id = request.query_params.get('session_id', '') or request.data.get('session_id', '')
-        
-        try:
-            session = ChatSession.objects.get(id=session_id, user=user)
-        except ChatSession.DoesNotExist:
-            return False, "Session not found"
-        return True, session
-    
     def patch(self, request):
+        """Update Session Title (Renamed from 'update' to 'patch' for DRF compatibility)"""
         found, session = self.get_session(request)
         if not found:
             return Response({"error": session}, status=404)
+        
         session_title = request.data.get('session_title')
-        session.title = session_title
-        session.save()
-        return Response({"message": "Session title updated", "data": session_title}, status=200)
+        if session_title:
+            session.title = session_title
+            session.save()
+            return Response({"message": "Session title updated", "data": session_title}, status=200)
+        return Response({"message": "No title provided"}, status=400)
 
     def delete(self, request):
+        """Delete a Session"""
         found, session = self.get_session(request)
         if not found:
             return Response({"error": session}, status=404)
         session.delete()
         return Response({"message": "Session deleted"}, status=200)
+
+    def get_session(self, request):
+        """Internal helper to fetch session"""
+        user, _ = self.get_user(request)
+        session_id = request.query_params.get('session_id') or request.data.get('session_id')
+        
+        try:
+            session = ChatSession.objects.get(id=session_id, user=user)
+            return True, session
+        except ChatSession.DoesNotExist:
+            return False, "Session not found"
