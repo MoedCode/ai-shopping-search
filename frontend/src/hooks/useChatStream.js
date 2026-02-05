@@ -1,24 +1,34 @@
 // src/hooks/useChatStream.js
-import { useState, useRef } from 'react';
-import { getGuestId, setGuestId } from '../services/guest';
+import { useState, useRef, useEffect } from 'react';
+import { getGuestId, setGuestId, ensureGuest } from '../services/guest';
 
 export function useChatStream() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [guestId, setGuestIdState] = useState(null);
   const abortControllerRef = useRef(null);
+
+  useEffect(() => {
+    const initGuest = async () => {
+      const id = await ensureGuest();
+      setGuestIdState(id);
+    };
+    initGuest();
+  }, []);
+
+  useEffect(() => {
+    if (guestId) {
+      loadHistory();
+    }
+  }, [guestId]);
 
   // 1. Fetch History (GET)
   const loadHistory = async () => {
-    const guestId = getGuestId();
-    if (!guestId) return; // No history for new users
+    if (!guestId) return; // Wait for guest ID to be set
 
-    // Get the last known session ID from local storage if you want to resume specific chat
-    // For now, let's assume we want the last active session or handle it via UI later
-    // This part depends on if you store session_id in localStorage too.
     const savedSessionId = localStorage.getItem('last_session_id'); 
-    
-    if(!savedSessionId) return;
+    if (!savedSessionId) return;
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/chat/session?session_id=${savedSessionId}`, {
@@ -28,9 +38,8 @@ export function useChatStream() {
       if (res.ok) {
         const history = await res.json();
         setSessionId(savedSessionId);
-        // Map backend format to frontend format
         const formatted = history.map(msg => ({
-          role: msg.role, // 'user' or 'assistant'
+          role: msg.role,
           content: msg.content,
           products: msg.metadata?.products || []
         }));
@@ -44,7 +53,7 @@ export function useChatStream() {
   // 2. Send Message & Stream Response (POST)
   const sendMessage = async (content) => {
     setIsLoading(true);
-    const guestId = getGuestId(); // Get existing ID or null
+    // guestId is from state now
 
     // Optimistic Update: Show user message immediately
     const tempUserMsg = { role: 'user', content: content };
@@ -94,7 +103,10 @@ export function useChatStream() {
 
               // 1. Handle Metadata (Guest ID & Session ID)
               if (data.type === 'meta') {
-                if (data.guest_id) setGuestId(data.guest_id);
+                if (data.guest_id) {
+                  setGuestId(data.guest_id); // This sets cookie/localStorage
+                  setGuestIdState(data.guest_id); // This updates React state
+                }
                 if (data.session_id) {
                     setSessionId(data.session_id);
                     localStorage.setItem('last_session_id', data.session_id);

@@ -11,10 +11,7 @@ export default function ChatInterface() {
   const listRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Load history on mount
-  useEffect(() => {
-    loadHistory();
-  }, []);
+
 
   // Auto-scroll to bottom
   useEffect(() => {

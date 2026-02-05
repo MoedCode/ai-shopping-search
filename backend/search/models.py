@@ -7,7 +7,7 @@ from accounts.models import User
 
 class UserSearch(BaseModel):
     """Store search results from users"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='search_results')
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='search_results')
     query = models.CharField(max_length=255)
     results = models.JSONField(default=list)  # Store search results as JSON
 

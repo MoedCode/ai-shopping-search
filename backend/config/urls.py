@@ -24,7 +24,7 @@ urlpatterns = [
 
     # Guest API endpoints
     path('chat/', include('chat.urls')),
-    path('search/', include('search.urls')),
+    # path('search/', include('search.urls')),
     # path('accounts/', include('accounts.urls')),
 
 ]
