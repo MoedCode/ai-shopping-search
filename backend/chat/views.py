@@ -39,12 +39,37 @@ class ChatView(APIView):
     - POST: Send a message (Streaming Response) & Deduplication logic.
     - DELETE: Clear chat history.
     """
+    def get(self, request):
+        """Retrieve Chat History"""
+        user, _ = self.get_user(request)
+        if not user:
+            return Response({"error": "User not found"}, status=404)
 
+    
+        session_id = request.query_params.get('session_id') or request.data.get('session_id')
+        
+        if not session_id:
+            try:
+                all_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
+                serialized_sessions = ChatSessionSerializer(all_sessions, many=True)
+                return Response({"guest_id":user.guest_id,"messages": serialized_sessions.data})
+            except ChatSession.DoesNotExist:
+                return Response({"error": "No sessions found"}, status=404)
+            # return Response({"error": "Session ID required"}, status=400)
+        
+        try:
+            session = ChatSession.objects.get(id=session_id, user=user)
+            messages = session.messages.all().order_by('created_at')
+            serialized_messages = ChatMessageSerializer(messages, many=True)
+            return Response(serialized_messages.data )
+        except ChatSession.DoesNotExist:
+            return Response({"error": "Session not found"}, status=404)
+        
     def get_user(self, request):
         """Helper to get Real User OR Guest User based on header/data"""
         if request.user.is_authenticated:
             return request.user, False
-        
+    
         # Priority: Header > Body
         guest_id = request.headers.get('X-Guest-Id') or request.data.get('guest_id')
         
@@ -148,7 +173,7 @@ class ChatView(APIView):
                                 continue
                             data = json.loads(clean_json)
                             
-                            if data.get("type") == "text_delta":
+                            if data.get("type") == "text-delta":
                                 full_agent_answer += data.get("delta", "")
                             
                             elif data.get("type") in ["tool-output-available", "tools-output-available"]:
@@ -192,21 +217,7 @@ class ChatView(APIView):
         response['Cache-Control'] = 'no-cache'
         return response
 
-    def get(self, request):
-        """Retrieve Chat History"""
-        user, _ = self.get_user(request)
-        session_id = request.query_params.get('session_id') or request.data.get('session_id')
-        
-        if not session_id:
-            return Response({"error": "Session ID required"}, status=400)
-        
-        try:
-            session = ChatSession.objects.get(id=session_id, user=user)
-            messages = session.messages.all().order_by('created_at')
-            serialized_messages = ChatMessageSerializer(messages, many=True)
-            return Response(serialized_messages.data)
-        except ChatSession.DoesNotExist:
-            return Response({"error": "Session not found"}, status=404)
+
 
     def patch(self, request):
         """Update Session Title (Renamed from 'update' to 'patch' for DRF compatibility)"""
