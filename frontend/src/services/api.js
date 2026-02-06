@@ -13,7 +13,13 @@ client.interceptors.request.use(async (cfg) => {
 })
 
 const CHAT_ENDPOINT = '/chat/guest'
+export const fetchUserSessions = async (guestId) => {
+  return client.get(CHAT_ENDPOINT, { params: { guest_id: guestId } }) // بدون session_id
+}
 
+export const deleteSession = async (guestId, sessionId) => {
+    return client.delete(CHAT_ENDPOINT, { data: { guest_id: guestId, session_id: sessionId } })
+}
 export const fetchChatHistory = async (guestId) => {
   return client.get(CHAT_ENDPOINT, { params: { guest_id: guestId } })
 }

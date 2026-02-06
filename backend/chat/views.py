@@ -8,7 +8,7 @@ from django.utils import timezone
 import json
 import uuid
 from .models import ChatSession, ChatMessage
-from .serializers import ChatMessageSerializer, ChatSessionSerializer
+from .serializers import ChatMessageSerializer, ChatSessionSerializer, ChatSessionSummarySerializer
 from .utils import query_algolia_streaming
 
 User = get_user_model()
@@ -39,7 +39,8 @@ class ChatView(APIView):
     - POST: Send a message (Streaming Response) & Deduplication logic.
     - DELETE: Clear chat history.
     """
-    def get(self, request):
+
+    def get_old(self, request):
         """Retrieve Chat History"""
         user, _ = self.get_user(request)
         if not user:
@@ -64,7 +65,27 @@ class ChatView(APIView):
             return Response(serialized_messages.data )
         except ChatSession.DoesNotExist:
             return Response({"error": "Session not found"}, status=404)
-        
+
+    def get(self, request):
+            """Retrieve Chat History OR List of Sessions"""
+            user, _ = self.get_user(request)
+            session_id = request.query_params.get('session_id') or request.data.get('session_id')
+            
+            # الحالة 1: جلب رسائل جلسة محددة
+            if session_id:
+                try:
+                    session = ChatSession.objects.get(id=session_id, user=user)
+                    messages = session.messages.all().order_by('created_at')
+                    serialized_messages = ChatMessageSerializer(messages, many=True)
+                    return Response(serialized_messages.data)
+                except ChatSession.DoesNotExist:
+                    return Response({"error": "Session not found"}, status=404)
+            
+            # الحالة 2: جلب قائمة الجلسات (للقائمة الجانبية)
+            else:
+                sessions = ChatSession.objects.filter(user=user).order_by('-last_message_at')
+                serializer = ChatSessionSummarySerializer(sessions, many=True)
+                return Response(serializer.data)
     def get_user(self, request):
         """Helper to get Real User OR Guest User based on header/data"""
         if request.user.is_authenticated:

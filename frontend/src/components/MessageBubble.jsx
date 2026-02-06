@@ -1,52 +1,56 @@
-// ai-shopping-search/frontend/src/components/MessageBubble.jsx
+//ai-shopping-search/src/components/MessageBubble.jsx
 'use client';
-
 export default function MessageBubble({ text, isUser, products }) {
-  // هذا الكود يبدو ممتازاً ومتوافقاً مع البيانات الجديدة
-  // لا يحتاج تغييرات جذرية طالما أن products عبارة عن Array
-  
   return (
-    <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-6 animation-fade-in`}>
-      <div className={`flex flex-col max-w-[85%] md:max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
+    <div className={`flex w-full mb-8 ${isUser ? 'justify-end' : 'justify-start'}`}>
+      
+      {/* Avatar for AI */}
+      {!isUser && (
+        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-red-500 flex-shrink-0 mr-4 mt-1 flex items-center justify-center text-white text-xs font-bold">
+            AI
+        </div>
+      )}
 
+      <div className={`flex flex-col max-w-[85%] md:max-w-2xl ${isUser ? 'items-end' : 'items-start'}`}>
+        
         {/* Text Area */}
-        {/* Only show bubble if there is text (sometimes AI returns only products first) */}
         {text && (
-            <div className={`px-5 py-4 rounded-2xl shadow-md text-sm md:text-base leading-relaxed relative ${
+            <div className={`py-2 px-4 rounded-2xl text-[15px] leading-7 ${
             isUser
-                ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-none'
-                : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm'
+                ? 'bg-[#f0f4f9] text-[#1f1f1f] rounded-br-sm' // User style like Gemini (Subtle gray)
+                : 'text-[#1f1f1f] w-full' // AI text plain
             }`}>
-            <p className="whitespace-pre-wrap m-0 font-medium">{text}</p>
+            <p className="whitespace-pre-wrap">{text}</p>
             </div>
         )}
 
-        {/* Product Cards Area */}
+        {/* Product Cards (Horizontal Scroll or Grid) */}
         {products && products.length > 0 && (
-          <div className="mt-4 w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((prod, idx) => (
               <a
                 key={idx}
-                href={prod.url || '#'} // Ensure your Algolia index has 'url'
+                href={prod.url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-white border border-gray-200 rounded-xl p-3 hover:shadow-lg hover:border-blue-300 transition-all duration-300 group"
+                className="flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full"
               >
-                <div className="flex items-start space-x-3 rtl:space-x-reverse">
-                    {/* Image handling - fallback if no image */}
-                    {prod.image_url ? (
-                        <img src={prod.image_url} alt={prod.name} className="w-16 h-16 object-cover rounded-lg" />
+                <div className="h-40 w-full bg-gray-100 relative flex items-center justify-center overflow-hidden">
+                    {prod.image ? (
+                        <img src={prod.image} alt={prod.name} className="object-contain h-full w-full p-2" />
                     ) : (
-                        <div className="w-16 h-16 bg-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center text-2xl">🛍️</div>
+                        <span className="text-4xl">🛍️</span>
                     )}
-                    
-                    <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600">
-                            {prod.name || prod.title}
-                        </h4>
-                        <p className="text-blue-600 font-extrabold text-sm mt-1">
+                </div>
+                <div className="p-3 flex flex-col flex-1">
+                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1" title={prod.name}>
+                        {prod.name}
+                    </h4>
+                    <div className="mt-auto pt-2 flex items-center justify-between">
+                        <span className="text-blue-600 font-bold text-sm">
                             {prod.price ? `$${prod.price}` : "Check Price"}
-                        </p>
+                        </span>
+                        <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">View</span>
                     </div>
                 </div>
               </a>

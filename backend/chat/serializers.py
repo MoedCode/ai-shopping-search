@@ -15,3 +15,10 @@ class ChatSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatSession
         fields = ['id', 'title', 'created_at', 'messages', 'last_message_at']
+class ChatSessionSummarySerializer(serializers.ModelSerializer):
+    """
+    Used for listing sessions in the Sidebar (lightweight, no messages).
+    """
+    class Meta:
+        model = ChatSession
+        fields = ['id', 'title', 'updated_at', 'created_at']

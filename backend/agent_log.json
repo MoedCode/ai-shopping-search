@@ -1,127 +1,115 @@
 {
-    "timestamp": "2026-02-06 14:39:17.021104+00:00",
+    "timestamp": "2026-02-06 14:44:51.644381+00:00",
     "session_id": "8df331ae-8691-4c9d-8aeb-4fdda03d2b3e",
-    "agent_response_text": "I'm on it! I will look for an HTC cell phone with 2GB RAM and over 16GB of storage.\nI couldn't find any HTC cell phones with those exact specifications. Let me try a broader search for HTC cell phones.I couldn't find any HTC cell phones that match your specifications for RAM and storage. However, I did find some accessories for HTC cell phones. The top result is an HTC case for HTC A11 Cell Phones in black, which features soft, durable TPU material to guard against accidental drops and bumps.",
+    "agent_response_text": "أهلاً بك! سأبحث لك عن تيشرت أسود سادة.\nنعتذر، لم نتمكن من العثور على المنتجات المطابقة لطلبك في الكتالوج الخاص بنا.",
     "products_hits": [
         {
-            "name": "HTC - Case for HTC A11 Cell Phones - Black",
-            "description": "Protect your phone from damage with this HTC NS-HTCAT2B case for HTC A11 cell phones, which features soft, durable TPU material to guard against accidental drops and bumps. The play-through design offers access to your phone's keys and open ports.",
-            "brand": "HTC",
-            "categories": [
-                "Cell Phones",
-                "Cell Phone Accessories",
-                "Cell Phone Cases & Clips"
+            "color": [
+                "blue"
             ],
-            "hierarchicalCategories": {
-                "lvl0": "Cell Phones",
-                "lvl1": "Cell Phones > Cell Phone Accessories",
-                "lvl2": "Cell Phones > Cell Phone Accessories > Cell Phone Cases & Clips"
+            "description": "Discover comfort and style with our blue relaxed fit t-shirt. Crafted from soft, stretchy material, it features a rounded neckline and short sleeves, making it an ideal choice for casual outings or lounging at home.",
+            "hierarchical_categories": {
+                "lvl0": "apparel",
+                "lvl1": "apparel > tops"
             },
-            "type": "Slim cases",
-            "price": 14.99,
-            "price_range": "1 - 50",
-            "image": "https://cdn-demo.algolia.com/bestbuy/8733772_sb.jpg",
-            "url": "http://www.bestbuy.com/site/htc-case-for-htc-a11-cell-phones-black/8733772.p?id=1219366048121&skuId=8733772&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
-            "free_shipping": false,
-            "popularity": 5899,
-            "rating": 4,
-            "objectID": "8733772"
+            "images": [
+                "https://storage.googleapis.com/landingpage-al/91410542_0.jpg"
+            ],
+            "price": 35,
+            "product_type": "t-shirts",
+            "showcase_image": "https://storage.googleapis.com/landingpage-al/91410542_0.jpg",
+            "tags": [
+                "blue",
+                "petite",
+                "boat-neck",
+                "soft",
+                "relaxed fit"
+            ],
+            "taxable": true,
+            "title": "Blue Relaxed Fit T-Shirt",
+            "units_sold": 980,
+            "weight": 0.01,
+            "objectID": "apparel-sample-data-2313869000"
         },
         {
-            "name": "Platinum Series - Kickstand Case for HTC One Cell Phones - Black",
-            "description": "This Platinum Series PT-HOC53SG case features a built-in kickstand to allow easy viewing of your HTC One cell phone in landscape orientation. The felt-lined holster and belt clip ensure simple portability, while offering protection on the go.",
-            "brand": "Platinum Series",
-            "categories": [
-                "Cell Phones",
-                "Cell Phone Accessories",
-                "Cell Phone Cases & Clips"
+            "color": [
+                "brown"
             ],
-            "hierarchicalCategories": {
-                "lvl0": "Cell Phones",
-                "lvl1": "Cell Phones > Cell Phone Accessories",
-                "lvl2": "Cell Phones > Cell Phone Accessories > Cell Phone Cases & Clips"
+            "description": "Discover ultimate comfort with our brown t-shirt, designed with a round neckline and short sleeves. Crafted from soft, lightweight material, it offers a relaxed fit, making it perfect for casual outings or lounging at home.",
+            "hierarchical_categories": {
+                "lvl0": "apparel",
+                "lvl1": "apparel > tops"
             },
-            "type": "Slim cases",
-            "price": 39.99,
-            "price_range": "1 - 50",
-            "image": "https://cdn-demo.algolia.com/bestbuy/8538081_sb.jpg",
-            "url": "http://www.bestbuy.com/site/platinum-series-kickstand-case-for-htc-one-cell-phones-black/8538081.p?id=1218878090182&skuId=8538081&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
-            "free_shipping": false,
-            "popularity": 1899,
-            "rating": 5,
-            "objectID": "8538081"
+            "images": [
+                "https://storage.googleapis.com/landingpage-al/91393182_0.jpg"
+            ],
+            "price": 25,
+            "product_type": "t-shirts",
+            "showcase_image": "https://storage.googleapis.com/landingpage-al/91393182_0.jpg",
+            "tags": [
+                "soft",
+                "lightweight",
+                "relaxed fit"
+            ],
+            "taxable": true,
+            "title": "Brown Soft T-Shirt",
+            "units_sold": 987,
+            "weight": 0.8,
+            "objectID": "apparel-sample-data-2313822000"
         },
         {
-            "name": "Insignia™ - Hard Shell Soft-Touch Case for HTC One Cell Phones - Blue",
-            "description": "Only at Best Buy  This Insignia&#8482; NS-MH1H2L hard shell soft-touch case features rugged polycarbonate material to shield your HTC One cell phone from damage caused by impacts. The play-through design retains your ability to use your phone's buttons and ports.",
-            "brand": "Insignia™",
-            "categories": [
-                "Cell Phones",
-                "Cell Phone Accessories",
-                "Cell Phone Cases & Clips"
+            "color": [
+                "light blue"
             ],
-            "hierarchicalCategories": {
-                "lvl0": "Cell Phones",
-                "lvl1": "Cell Phones > Cell Phone Accessories",
-                "lvl2": "Cell Phones > Cell Phone Accessories > Cell Phone Cases & Clips"
+            "description": "Discover the charm of our light blue denim t-shirt, designed with a comfortable loose fit and a classic round neckline. Crafted from soft denim material, this piece is perfect for casual outings and pairs effortlessly with your favorite jeans or shorts.",
+            "hierarchical_categories": {
+                "lvl0": "apparel",
+                "lvl1": "apparel > tops"
             },
-            "type": "Slim cases",
-            "price": 14.99,
-            "price_range": "1 - 50",
-            "image": "https://cdn-demo.algolia.com/bestbuy/3409004_sb.jpg",
-            "url": "http://www.bestbuy.com/site/insignia-hard-shell-soft-touch-case-for-htc-one-cell-phones-blue/3409004.p?id=1219091219912&skuId=3409004&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
-            "free_shipping": false,
-            "popularity": 5376,
-            "rating": 6,
-            "objectID": "3409004"
+            "images": [
+                "https://storage.googleapis.com/landingpage-al/91341536_1.jpg"
+            ],
+            "price": 45,
+            "product_type": "t-shirts",
+            "showcase_image": "https://storage.googleapis.com/landingpage-al/91341536_1.jpg",
+            "tags": [
+                "blue",
+                "embroidered",
+                "casual",
+                "soft denim"
+            ],
+            "taxable": true,
+            "title": "Light Blue Denim T-Shirt",
+            "units_sold": 932,
+            "weight": 0.27,
+            "objectID": "apparel-sample-data-2313576000"
         },
         {
-            "name": "HTC - Case for HTC One (M8) Cell Phones - Translucent",
-            "description": "Shield your HTC One (M8) cell phone from scratches and scuffs with this HTC 63-2841-05-BB case that features a hard shell design for durable defense. A screen protector is included for additional peace of mind.",
-            "brand": "HTC",
-            "categories": [
-                "Cell Phones",
-                "Cell Phone Accessories",
-                "Cell Phone Cases & Clips"
+            "color": [
+                "deep burgundy"
             ],
-            "hierarchicalCategories": {
-                "lvl0": "Cell Phones",
-                "lvl1": "Cell Phones > Cell Phone Accessories",
-                "lvl2": "Cell Phones > Cell Phone Accessories > Cell Phone Cases & Clips"
+            "description": "Discover comfort and style with our deep burgundy v-neck t-shirt. Crafted from a soft cotton blend, this tee offers a relaxed fit and features a simple design with a rounded neckline and short sleeves, making it a perfect choice for everyday wear.",
+            "hierarchical_categories": {
+                "lvl0": "apparel",
+                "lvl1": "apparel > tops"
             },
-            "type": "So non iphone cases",
-            "price": 14.99,
-            "price_range": "1 - 50",
-            "image": "https://cdn-demo.algolia.com/bestbuy/5641313_sb.jpg",
-            "url": "http://www.bestbuy.com/site/htc-case-for-htc-one-m8-cell-phones-translucent/5641313.p?id=1219145256028&skuId=5641313",
-            "free_shipping": false,
-            "popularity": 5898,
-            "rating": 1,
-            "objectID": "5641313"
-        },
-        {
-            "name": "HTC - Flip Case for HTC One (M8) Cell Phones - Imperial Blue",
-            "description": "Safeguard your HTC One (M8) cell phone against scratches and other minor damage with this HTC 34-2638-05-BB case that is constructed from durable material for reliable defense. The front flip cover protects your phone's display.",
-            "brand": "HTC",
-            "categories": [
-                "Cell Phones",
-                "Cell Phone Accessories",
-                "Cell Phone Cases & Clips"
+            "images": [
+                "https://storage.googleapis.com/landingpage-al/91329673_0.jpg"
             ],
-            "hierarchicalCategories": {
-                "lvl0": "Cell Phones",
-                "lvl1": "Cell Phones > Cell Phone Accessories",
-                "lvl2": "Cell Phones > Cell Phone Accessories > Cell Phone Cases & Clips"
-            },
-            "type": "So non iphone cases",
-            "price": 39.99,
-            "price_range": "1 - 50",
-            "image": "https://cdn-demo.algolia.com/bestbuy/5200256_sb.jpg",
-            "url": "http://www.bestbuy.com/site/htc-flip-case-for-htc-one-m8-cell-phones-imperial-blue/5200256.p?id=1219113374850&skuId=5200256",
-            "free_shipping": false,
-            "popularity": 5892,
-            "rating": 3,
-            "objectID": "5200256"
+            "price": 25,
+            "product_type": "t-shirts",
+            "showcase_image": "https://storage.googleapis.com/landingpage-al/91329673_0.jpg",
+            "tags": [
+                "multicolor",
+                "slub",
+                "v-neck",
+                "casual"
+            ],
+            "taxable": true,
+            "title": "Deep Burgundy Relaxed Fit T-Shirt",
+            "units_sold": 890,
+            "weight": 0.9,
+            "objectID": "apparel-sample-data-2313494000"
         }
     ]
 }
