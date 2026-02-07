@@ -1,6 +1,6 @@
 # ai-shopping-search/backend/chat/serializers.py
 from rest_framework import serializers
-from .models import ChatSession, ChatMessage
+from .models import ChatSession, ChatMessage, SavedProduct
 
 class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,3 +22,15 @@ class ChatSessionSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatSession
         fields = ['id', 'title', 'updated_at', 'created_at']
+class SavedProductSerializer(serializers.ModelSerializer):
+    """
+    For My Stuff page.
+    """
+    class Meta:
+        model = SavedProduct
+        fields = [
+            'id', 'product_id', 'name', 'description', 'brand', 
+            'price', 'price_range', 'image', 'url', 'categories', 
+            'hierarchical_categories', 'type', 'free_shipping', 
+            'popularity', 'rating', 'created_at'
+        ]

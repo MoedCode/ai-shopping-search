@@ -1,7 +1,7 @@
 {
-    "timestamp": "2026-02-06 14:44:51.644381+00:00",
-    "session_id": "8df331ae-8691-4c9d-8aeb-4fdda03d2b3e",
-    "agent_response_text": "أهلاً بك! سأبحث لك عن تيشرت أسود سادة.\nنعتذر، لم نتمكن من العثور على المنتجات المطابقة لطلبك في الكتالوج الخاص بنا.",
+    "timestamp": "2026-02-07 19:26:05.735308+00:00",
+    "session_id": "3c89b208-c7d8-48aa-9f5d-a31b8ef1cc00",
+    "agent_response_text": "Sorry, I couldn't find matching items in our catalog.",
     "products_hits": [
         {
             "color": [
@@ -110,6 +110,36 @@
             "units_sold": 890,
             "weight": 0.9,
             "objectID": "apparel-sample-data-2313494000"
+        },
+        {
+            "color": [
+                "red",
+                "blue",
+                "green",
+                "white"
+            ],
+            "description": "Discover a vibrant expression of style with our geometric print button-down shirt. Crafted from soft, lightweight material, this relaxed fit shirt features a captivating abstract design in red, blue, green, and white. Ideal for effortlessly pairing with jeans or dress pants, this versatile piece transitions seamlessly from casual outings to semi-formal events.",
+            "hierarchical_categories": {
+                "lvl0": "apparel",
+                "lvl1": "apparel > shirts"
+            },
+            "images": [
+                "https://storage.googleapis.com/landingpage-al/91435921_0.jpg"
+            ],
+            "price": 75,
+            "product_type": "shirts",
+            "showcase_image": "https://storage.googleapis.com/landingpage-al/91435921_0.jpg",
+            "tags": [
+                "abstract",
+                "geometric",
+                "casual",
+                "semi-formal"
+            ],
+            "taxable": true,
+            "title": "Geometric Print Button-Down Shirt",
+            "units_sold": 980,
+            "weight": 0.66,
+            "objectID": "apparel-sample-data-2304948000"
         }
     ]
 }

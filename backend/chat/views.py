@@ -7,8 +7,10 @@ from django.http import StreamingHttpResponse
 from django.utils import timezone
 import json
 import uuid
-from .models import ChatSession, ChatMessage
-from .serializers import ChatMessageSerializer, ChatSessionSerializer, ChatSessionSummarySerializer
+from .models import ChatSession, ChatMessage, SavedProduct
+from .serializers import (
+    ChatMessageSerializer, ChatSessionSerializer, ChatSessionSummarySerializer, SavedProductSerializer
+    )
 from .utils import query_algolia_streaming
 
 User = get_user_model()
@@ -271,3 +273,105 @@ class ChatView(APIView):
             return True, session
         except ChatSession.DoesNotExist:
             return False, "Session not found"
+        
+class SavedProductsView(APIView):
+    """
+    Handles 'My Stuff' logic: 
+    - GET: Retrieve all saved items for a user or a specific one by Django ID.
+    - POST: Save a product from Algolia results.
+    - DELETE: Remove one specific item by Django ID or clear all items.
+    """
+
+    def get_user_from_request(self, request):
+        """Helper to identify User or Guest"""
+        if request.user.is_authenticated:
+            return request.user
+        
+        guest_id = request.headers.get('X-Guest-Id') or request.query_params.get('guest_id')
+        if guest_id:
+            try:
+                return User.objects.get(username=guest_id, is_guest=True)
+            except User.DoesNotExist:
+                return None
+        return None
+
+    def get(self, request):
+        user = self.get_user_from_request(request)
+        if not user:
+            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Check if a specific Django Database ID was provided in the query params
+        product_db_id = request.query_params.get('id')
+        
+        if product_db_id:
+            try:
+                product = SavedProduct.objects.get(id=product_db_id, user=user)
+                serializer = SavedProductSerializer(product)
+                return Response(serializer.data)
+            except SavedProduct.DoesNotExist:
+                return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Default: Provide all products for this user
+        products = SavedProduct.objects.filter(user=user)
+        serializer = SavedProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user = self.get_user_from_request(request)
+        if not user:
+            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        data = request.data
+        # objectID is the unique identifier from Algolia
+        product_id = data.get('objectID') or data.get('product_id')
+
+        if not product_id:
+            return Response({"error": "Product identifier missing"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Deduplication logic
+        if SavedProduct.objects.filter(user=user, product_id=product_id).exists():
+            return Response({"message": "Product already in My Stuff"}, status=status.HTTP_200_OK)
+
+        SavedProduct.objects.create(
+            user=user,
+            product_id=product_id,
+            name=data.get('name'),
+            description=data.get('description'),
+            brand=data.get('brand'),
+            price=data.get('price'),
+            price_range=data.get('price_range'),
+            image=data.get('image'),
+            url=data.get('url'),
+            categories=data.get('categories', []),
+            hierarchical_categories=data.get('hierarchicalCategories', {}),
+            type=data.get('type'),
+            free_shipping=data.get('free_shipping', False),
+            popularity=data.get('popularity', 0),
+            rating=data.get('rating', 0)
+        )
+        return Response({"message": "Product saved successfully"}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        user = self.get_user_from_request(request)
+        if not user:
+            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Check for 'clear_all' flag in the request body or query params
+        clear_all = request.data.get('clear_all') or request.query_params.get('clear_all')
+        
+        if clear_all:
+            count, _ = SavedProduct.objects.filter(user=user).delete()
+            return Response({"message": f"Successfully cleared {count} items from My Stuff"}, status=status.HTTP_200_OK)
+
+        # Delete a specific item using the Django primary key (ID)
+        product_db_id = request.data.get('id') or request.query_params.get('id')
+        
+        if not product_db_id:
+            return Response({"error": "No ID provided for deletion"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = SavedProduct.objects.get(id=product_db_id, user=user)
+            product.delete()
+            return Response({"message": "Item removed from My Stuff"}, status=status.HTTP_200_OK)
+        except SavedProduct.DoesNotExist:
+            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
