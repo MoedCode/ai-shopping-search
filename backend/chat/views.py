@@ -273,7 +273,20 @@ class ChatView(APIView):
             return True, session
         except ChatSession.DoesNotExist:
             return False, "Session not found"
-        
+       
+def debug_log_agent_response(session_id, full_answer, hits):
+    log_data = {
+        "timestamp": str(timezone.now()),
+        "session_id": str(session_id),
+        "agent_response_text": full_answer,
+        "products_hits": hits
+    }
+    try:
+        with open('agent_log.json', 'w', encoding='utf-8') as f:
+            json.dump(log_data, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"DEBUG ERROR: {e}")
+
 class SavedProductsView(APIView):
     """
     Handles 'My Stuff' logic: 
@@ -281,12 +294,9 @@ class SavedProductsView(APIView):
     - POST: Save a product from Algolia results.
     - DELETE: Remove one specific item by Django ID or clear all items.
     """
-
     def get_user_from_request(self, request):
-        """Helper to identify User or Guest"""
         if request.user.is_authenticated:
             return request.user
-        
         guest_id = request.headers.get('X-Guest-Id') or request.query_params.get('guest_id')
         if guest_id:
             try:
@@ -298,50 +308,59 @@ class SavedProductsView(APIView):
     def get(self, request):
         user = self.get_user_from_request(request)
         if not user:
-            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "User identity required"}, status=401)
 
-        # Check if a specific Django Database ID was provided in the query params
         product_db_id = request.query_params.get('id')
-        
         if product_db_id:
             try:
                 product = SavedProduct.objects.get(id=product_db_id, user=user)
-                serializer = SavedProductSerializer(product)
-                return Response(serializer.data)
+                return Response(SavedProductSerializer(product).data)
             except SavedProduct.DoesNotExist:
-                return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Product not found"}, status=404)
 
-        # Default: Provide all products for this user
         products = SavedProduct.objects.filter(user=user)
-        serializer = SavedProductSerializer(products, many=True)
-        return Response(serializer.data)
+        return Response(SavedProductSerializer(products, many=True).data)
 
     def post(self, request):
         user = self.get_user_from_request(request)
         if not user:
-            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "User identity required"}, status=401)
         
         data = request.data
-        # objectID is the unique identifier from Algolia
         product_id = data.get('objectID') or data.get('product_id')
 
         if not product_id:
-            return Response({"error": "Product identifier missing"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Product identifier missing"}, status=400)
 
-        # Deduplication logic
         if SavedProduct.objects.filter(user=user, product_id=product_id).exists():
-            return Response({"message": "Product already in My Stuff"}, status=status.HTTP_200_OK)
+            return Response({"message": "Product already saved"}, status=200)
 
+        # --- FIX: Robust Price Handling to prevent 500 Error ---
+        raw_price = data.get('price')
+        clean_price = 0.0
+        if raw_price:
+            try:
+                # Remove currency symbols if present (e.g., "$100" -> "100")
+                if isinstance(raw_price, str):
+                    clean_price = float(re.sub(r'[^\d.]', '', raw_price))
+                else:
+                    clean_price = float(raw_price)
+            except (ValueError, TypeError):
+                clean_price = 0.0 # Fallback
+
+        # --- FIX: Field Mapping ---
         SavedProduct.objects.create(
             user=user,
             product_id=product_id,
-            name=data.get('name'),
+            name=data.get('name') or "Unknown Product",
             description=data.get('description'),
             brand=data.get('brand'),
-            price=data.get('price'),
-            price_range=data.get('price_range'),
-            image=data.get('image'),
-            url=data.get('url'),
+            price=clean_price,
+            # Map frontend 'image_url' to model 'image'
+            image=data.get('image_url') or data.get('image'),
+            # Map frontend 'product_url' to model 'url'
+            url=data.get('product_url') or data.get('url'),
+            
             categories=data.get('categories', []),
             hierarchical_categories=data.get('hierarchicalCategories', {}),
             type=data.get('type'),
@@ -349,29 +368,24 @@ class SavedProductsView(APIView):
             popularity=data.get('popularity', 0),
             rating=data.get('rating', 0)
         )
-        return Response({"message": "Product saved successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Product saved successfully"}, status=201)
 
     def delete(self, request):
         user = self.get_user_from_request(request)
         if not user:
-            return Response({"error": "User identity required"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "User identity required"}, status=401)
 
-        # Check for 'clear_all' flag in the request body or query params
-        clear_all = request.data.get('clear_all') or request.query_params.get('clear_all')
-        
-        if clear_all:
-            count, _ = SavedProduct.objects.filter(user=user).delete()
-            return Response({"message": f"Successfully cleared {count} items from My Stuff"}, status=status.HTTP_200_OK)
-
-        # Delete a specific item using the Django primary key (ID)
         product_db_id = request.data.get('id') or request.query_params.get('id')
         
         if not product_db_id:
-            return Response({"error": "No ID provided for deletion"}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data.get('clear_all') == True:
+                SavedProduct.objects.filter(user=user).delete()
+                return Response({"message": "All items cleared"}, status=200)
+            return Response({"error": "No ID provided"}, status=400)
 
         try:
             product = SavedProduct.objects.get(id=product_db_id, user=user)
             product.delete()
-            return Response({"message": "Item removed from My Stuff"}, status=status.HTTP_200_OK)
+            return Response({"message": "Item removed"}, status=200)
         except SavedProduct.DoesNotExist:
-            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Item not found"}, status=404)

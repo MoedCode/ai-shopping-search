@@ -1,145 +1,129 @@
 {
-    "timestamp": "2026-02-07 19:26:05.735308+00:00",
+    "timestamp": "2026-02-07 19:56:47.233968+00:00",
     "session_id": "3c89b208-c7d8-48aa-9f5d-a31b8ef1cc00",
-    "agent_response_text": "Sorry, I couldn't find matching items in our catalog.",
+    "agent_response_text": "I understand you're looking for fast chargers. I found several options that could be a good fit.\n\nThe **Apple - 29W USB-C Power Adapter - White** is a strong option, offering fast and efficient charging, particularly for MacBook computers with a USB-C port.",
     "products_hits": [
         {
-            "color": [
-                "blue"
+            "name": "Apple - 29W USB-C Power Adapter - White",
+            "description": "The Apple 29W USB-C Power adapter offers fast, efficient charging at home, in the office, or on the go. This adapter is compatible with MacBook computers featuring a USB-C port and requires a USB-C Charge Cable (sold separately).",
+            "brand": "Apple",
+            "categories": [
+                "Computers & Tablets",
+                "Laptop Accessories",
+                "Laptop Chargers & Adapters"
             ],
-            "description": "Discover comfort and style with our blue relaxed fit t-shirt. Crafted from soft, stretchy material, it features a rounded neckline and short sleeves, making it an ideal choice for casual outings or lounging at home.",
-            "hierarchical_categories": {
-                "lvl0": "apparel",
-                "lvl1": "apparel > tops"
+            "hierarchicalCategories": {
+                "lvl0": "Computers & Tablets",
+                "lvl1": "Computers & Tablets > Laptop Accessories",
+                "lvl2": "Computers & Tablets > Laptop Accessories > Laptop Chargers & Adapters"
             },
-            "images": [
-                "https://storage.googleapis.com/landingpage-al/91410542_0.jpg"
-            ],
-            "price": 35,
-            "product_type": "t-shirts",
-            "showcase_image": "https://storage.googleapis.com/landingpage-al/91410542_0.jpg",
-            "tags": [
-                "blue",
-                "petite",
-                "boat-neck",
-                "soft",
-                "relaxed fit"
-            ],
-            "taxable": true,
-            "title": "Blue Relaxed Fit T-Shirt",
-            "units_sold": 980,
-            "weight": 0.01,
-            "objectID": "apparel-sample-data-2313869000"
+            "type": "Notebook accessories",
+            "price": 49,
+            "price_range": "1 - 50",
+            "image": "https://cdn-demo.algolia.com/bestbuy/6600069_sb.jpg",
+            "url": "http://www.bestbuy.com/site/apple-29w-usb-c-power-adapter-white/6600069.p?id=1219663250413&skuId=6600069&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": true,
+            "popularity": 9745,
+            "rating": 3,
+            "objectID": "6600069"
         },
         {
-            "color": [
-                "brown"
+            "name": "Platinum - Quick Charge Wall Charger - Black",
+            "description": "Platinum Quick Charge Wall Charger: Keep your electronic devices powered with this universally compatible charger. Qualcomm Quick Charge 2.0 enables fast charging for a wide range of devices, including smartphones, tablets, e-readers and more.",
+            "brand": "Platinum",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories"
             ],
-            "description": "Discover ultimate comfort with our brown t-shirt, designed with a round neckline and short sleeves. Crafted from soft, lightweight material, it offers a relaxed fit, making it perfect for casual outings or lounging at home.",
-            "hierarchical_categories": {
-                "lvl0": "apparel",
-                "lvl1": "apparel > tops"
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories"
             },
-            "images": [
-                "https://storage.googleapis.com/landingpage-al/91393182_0.jpg"
-            ],
-            "price": 25,
-            "product_type": "t-shirts",
-            "showcase_image": "https://storage.googleapis.com/landingpage-al/91393182_0.jpg",
-            "tags": [
-                "soft",
-                "lightweight",
-                "relaxed fit"
-            ],
-            "taxable": true,
-            "title": "Brown Soft T-Shirt",
-            "units_sold": 987,
-            "weight": 0.8,
-            "objectID": "apparel-sample-data-2313822000"
+            "type": "Chargers",
+            "price": 24.99,
+            "price_range": "1 - 50",
+            "image": "https://cdn-demo.algolia.com/bestbuy/1637019_rb.jpg",
+            "url": "http://www.bestbuy.com/site/platinum-quick-charge-wall-charger-black/1637019.p?id=1219507977948&skuId=1637019&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": true,
+            "popularity": 1924,
+            "rating": 6,
+            "objectID": "1637019"
         },
         {
-            "color": [
-                "light blue"
+            "name": "DigiPower - Travel Charger - Black",
+            "description": "Power up your Sony digital camera battery with this DigiPower RF-TC-55S travel charger that offers a 1-amp USB charging port and a fast refueling time. The charger includes a European wall plug, so you can power your device while you're on vacation.",
+            "brand": "DigiPower",
+            "categories": [
+                "Cameras & Camcorders",
+                "Digital Camera Accessories",
+                "Camera Batteries & Power",
+                "Camera Chargers & Adapters"
             ],
-            "description": "Discover the charm of our light blue denim t-shirt, designed with a comfortable loose fit and a classic round neckline. Crafted from soft denim material, this piece is perfect for casual outings and pairs effortlessly with your favorite jeans or shorts.",
-            "hierarchical_categories": {
-                "lvl0": "apparel",
-                "lvl1": "apparel > tops"
+            "hierarchicalCategories": {
+                "lvl0": "Cameras & Camcorders",
+                "lvl1": "Cameras & Camcorders > Digital Camera Accessories",
+                "lvl2": "Cameras & Camcorders > Digital Camera Accessories > Camera Batteries & Power",
+                "lvl3": "Cameras & Camcorders > Digital Camera Accessories > Camera Batteries & Power > Camera Chargers & Adapters"
             },
-            "images": [
-                "https://storage.googleapis.com/landingpage-al/91341536_1.jpg"
-            ],
-            "price": 45,
-            "product_type": "t-shirts",
-            "showcase_image": "https://storage.googleapis.com/landingpage-al/91341536_1.jpg",
-            "tags": [
-                "blue",
-                "embroidered",
-                "casual",
-                "soft denim"
-            ],
-            "taxable": true,
-            "title": "Light Blue Denim T-Shirt",
-            "units_sold": 932,
-            "weight": 0.27,
-            "objectID": "apparel-sample-data-2313576000"
+            "type": "Misc camera acces",
+            "price": 39.99,
+            "price_range": "1 - 50",
+            "image": "https://cdn-demo.algolia.com/bestbuy/9285384_sb.jpg",
+            "url": "http://www.bestbuy.com/site/digipower-travel-charger-black/9285384.p?id=1219701842329&skuId=9285384&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 7594,
+            "rating": 3,
+            "objectID": "9285384"
         },
         {
-            "color": [
-                "deep burgundy"
+            "name": "Apple - 12W USB Power Adapter - White",
+            "description": "Keep your iPad, iPad mini, iPhone or iPod powered and ready for use with this 12W Apple&#174; MD836LL/A USB adapter that features a Lightning connector for fast, efficient charging. The compact design enables simple on-the-go portability.",
+            "brand": "Apple",
+            "categories": [
+                "Computers & Tablets",
+                "iPad & Tablet Accessories",
+                "iPad Accessories",
+                "iPad A/V Cables & Adapters"
             ],
-            "description": "Discover comfort and style with our deep burgundy v-neck t-shirt. Crafted from a soft cotton blend, this tee offers a relaxed fit and features a simple design with a rounded neckline and short sleeves, making it a perfect choice for everyday wear.",
-            "hierarchical_categories": {
-                "lvl0": "apparel",
-                "lvl1": "apparel > tops"
+            "hierarchicalCategories": {
+                "lvl0": "Computers & Tablets",
+                "lvl1": "Computers & Tablets > iPad & Tablet Accessories",
+                "lvl2": "Computers & Tablets > iPad & Tablet Accessories > iPad Accessories",
+                "lvl3": "Computers & Tablets > iPad & Tablet Accessories > iPad Accessories > iPad A/V Cables & Adapters"
             },
-            "images": [
-                "https://storage.googleapis.com/landingpage-al/91329673_0.jpg"
-            ],
-            "price": 25,
-            "product_type": "t-shirts",
-            "showcase_image": "https://storage.googleapis.com/landingpage-al/91329673_0.jpg",
-            "tags": [
-                "multicolor",
-                "slub",
-                "v-neck",
-                "casual"
-            ],
-            "taxable": true,
-            "title": "Deep Burgundy Relaxed Fit T-Shirt",
-            "units_sold": 890,
-            "weight": 0.9,
-            "objectID": "apparel-sample-data-2313494000"
+            "type": "Chargers",
+            "price": 21.99,
+            "price_range": "1 - 50",
+            "image": "https://cdn-demo.algolia.com/bestbuy/7006915_sb.jpg",
+            "url": "http://www.bestbuy.com/site/apple-12w-usb-power-adapter-white/7006915.p?id=1218821197031&skuId=7006915&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 9756,
+            "rating": 2,
+            "objectID": "7006915"
         },
         {
-            "color": [
-                "red",
-                "blue",
-                "green",
-                "white"
+            "name": "DigiPower - Dual USB Vehicle Charger - Black",
+            "description": "Recharge your mobile phone, MP3 player or tablet while you're on the go with this DigiPower SP-PC200 vehicle charger, which delivers 10.5W of power for fast performance and features dual USB interfaces for simultaneously providing power to 2 devices.",
+            "brand": "DigiPower",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Car Chargers"
             ],
-            "description": "Discover a vibrant expression of style with our geometric print button-down shirt. Crafted from soft, lightweight material, this relaxed fit shirt features a captivating abstract design in red, blue, green, and white. Ideal for effortlessly pairing with jeans or dress pants, this versatile piece transitions seamlessly from casual outings to semi-formal events.",
-            "hierarchical_categories": {
-                "lvl0": "apparel",
-                "lvl1": "apparel > shirts"
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Car Chargers"
             },
-            "images": [
-                "https://storage.googleapis.com/landingpage-al/91435921_0.jpg"
-            ],
-            "price": 75,
-            "product_type": "shirts",
-            "showcase_image": "https://storage.googleapis.com/landingpage-al/91435921_0.jpg",
-            "tags": [
-                "abstract",
-                "geometric",
-                "casual",
-                "semi-formal"
-            ],
-            "taxable": true,
-            "title": "Geometric Print Button-Down Shirt",
-            "units_sold": 980,
-            "weight": 0.66,
-            "objectID": "apparel-sample-data-2304948000"
+            "type": "So camera accy",
+            "price": 14.99,
+            "price_range": "1 - 50",
+            "image": "https://cdn-demo.algolia.com/bestbuy/1319463_sb.jpg",
+            "url": "http://www.bestbuy.com/site/digipower-dual-usb-vehicle-charger-black/1319463.p?id=1219048897041&skuId=1319463",
+            "free_shipping": true,
+            "popularity": 7628,
+            "rating": 4,
+            "objectID": "1319463"
         }
     ]
 }
