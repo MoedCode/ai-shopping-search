@@ -1,6 +1,137 @@
 {
-    "timestamp": "2026-02-08 02:18:19.766787+00:00",
-    "session_id": "b3c55e03-94d8-4e0b-8184-f52bd5010cb9",
-    "agent_response_text": "أهلاً بك! بالتأكيد، يمكنني مساعدتك في العثور على كلوتات. لقد وجدت لك هذه الخيارات المميزة:\n\nSorry, I couldn't find matching items in our catalog.",
-    "products_hits": []
+    "timestamp": "2026-02-08 13:24:06.049708+00:00",
+    "session_id": "43fdae78-1221-4335-94fd-092ee0755f05",
+    "agent_response_text": "I understand you're looking for smartwatches. It seems my initial search primarily returned smartwatch accessories like bands. I'll broaden my search to find actual smartwatches for you.I understand you're looking for smartwatches. I found several options for you.\n\nThe top result is the Pebble - Smartwatch 33mm Plastic - Red Silicone. It's a versatile smartwatch that allows you to track your morning run and check scores, putting useful apps and notifications right on your wrist.",
+    "products_hits": [
+        {
+            "name": "Pebble - Smartwatch 33mm Plastic - Red Silicone",
+            "description": "Pebble Smartwatch: From tracking your morning run to checking your favorite team's score during the big game, this watch puts useful apps and notifications on your wrist.",
+            "brand": "Pebble",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Smartwatches & Accessories",
+                "Smartwatches"
+            ],
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories",
+                "lvl3": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories > Smartwatches"
+            },
+            "type": "Smartwatches",
+            "price": 99.99,
+            "price_range": "50 - 100",
+            "image": "https://cdn-demo.algolia.com/bestbuy/9713881_sb.jpg",
+            "url": "http://www.bestbuy.com/site/pebble-smartwatch-33mm-plastic-red-silicone/9713881.p?id=1219034549411&skuId=9713881&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 2236,
+            "rating": 4,
+            "objectID": "9713881"
+        },
+        {
+            "name": "Pebble - Smartwatch 33mm Plastic - Black Silicone",
+            "description": "Pebble Smartwatch: From tracking your morning run to checking your favorite team's score during the big game, this watch puts useful apps and notifications on your wrist.",
+            "brand": "Pebble",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Smartwatches & Accessories",
+                "Smartwatches"
+            ],
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories",
+                "lvl3": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories > Smartwatches"
+            },
+            "type": "Smartwatches",
+            "price": 99.99,
+            "price_range": "50 - 100",
+            "image": "https://cdn-demo.algolia.com/bestbuy/9713809_sb.jpg",
+            "url": "http://www.bestbuy.com/site/pebble-smartwatch-33mm-plastic-black-silicone/9713809.p?id=1219034546379&skuId=9713809&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 2237,
+            "rating": 3,
+            "objectID": "9713809"
+        },
+        {
+            "name": "Pebble - Smartwatch 33mm Plastic - White Silicone",
+            "description": "Pebble Smartwatch: From tracking your morning run to checking your favorite team's score during the big game, this watch puts useful apps and notifications on your wrist.",
+            "brand": "Pebble",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Smartwatches & Accessories",
+                "Smartwatches"
+            ],
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories",
+                "lvl3": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories > Smartwatches"
+            },
+            "type": "Smartwatches",
+            "price": 99.99,
+            "price_range": "50 - 100",
+            "image": "https://cdn-demo.algolia.com/bestbuy/6819352_sb.jpg",
+            "url": "http://www.bestbuy.com/site/pebble-smartwatch-33mm-plastic-white-silicone/6819352.p?id=1219241420096&skuId=6819352&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 2235,
+            "rating": 3,
+            "objectID": "6819352"
+        },
+        {
+            "name": "Huawei - Smartwatch 42mm for Select Apple® iOS and Android Devices - Silver Stainless Steel with Stainless Steel Mesh",
+            "description": "Huawei Smartwatch: Receive alerts for your calls, texts and apps with this convenient smartwatch, which wirelessly links with your compatible Apple iOS or Android device via Bluetooth. You can monitor your fitness stats, including your heart rate and activity levels. Plus, control functions simply by saying \"OK Google\" and speaking commands.",
+            "brand": "Huawei",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Smartwatches & Accessories",
+                "Smartwatches"
+            ],
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories",
+                "lvl3": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories > Smartwatches"
+            },
+            "type": "Smartwatches",
+            "price": 399.99,
+            "price_range": "200 - 500",
+            "image": "https://cdn-demo.algolia.com/bestbuy/4457703_sb.jpg",
+            "url": "http://www.bestbuy.com/site/huawei-smartwatch-42mm-for-select-apple-ios-and-android-devices-silver-stainless-steel-with-stainless-steel-mesh/4457703.p?id=1219750723816&skuId=4457703&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": false,
+            "popularity": 5877,
+            "rating": 5,
+            "objectID": "4457703"
+        },
+        {
+            "name": "Huawei - Smartwatch 42mm Stainless Steel - Black Stainless Steel",
+            "description": "Huawei Smartwatch: Stay connected on the go with this smartwatch, which provides helpful notifications when you receive calls, texts and app alerts on your compatible Apple&#174; iOS or Android device. You can control functions just by saying \"OK Google\" and speaking your commands. Plus, meet your health and fitness goals with a built-in activity tracker with heart rate monitor.",
+            "brand": "Huawei",
+            "categories": [
+                "Cell Phones",
+                "Cell Phone Accessories",
+                "Smartwatches & Accessories",
+                "Smartwatches"
+            ],
+            "hierarchicalCategories": {
+                "lvl0": "Cell Phones",
+                "lvl1": "Cell Phones > Cell Phone Accessories",
+                "lvl2": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories",
+                "lvl3": "Cell Phones > Cell Phone Accessories > Smartwatches & Accessories > Smartwatches"
+            },
+            "type": "Smartwatches",
+            "price": 449.99,
+            "price_range": "200 - 500",
+            "image": "https://cdn-demo.algolia.com/bestbuy/4457700_sb.jpg",
+            "url": "http://www.bestbuy.com/site/huawei-smartwatch-42mm-stainless-steel-black-stainless-steel/4457700.p?id=1219750723814&skuId=4457700&cmp=RMX&ky=1uWSHMdQqBeVJB9cXgEke60s5EjfS6M1W",
+            "free_shipping": true,
+            "popularity": 5876,
+            "rating": 3,
+            "objectID": "4457700"
+        }
+    ]
 }
