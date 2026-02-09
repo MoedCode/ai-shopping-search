@@ -1,82 +1,65 @@
 //ai-shopping-search/frontend/src/components/Header.jsx
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { UserCircleIcon, Bars3Icon } from '@heroicons/react/24/solid'
-import { logoutUser, deleteAccount } from '../services/api'
+import { Bars3Icon } from '@heroicons/react/24/solid'
+import { logoutUser } from '../services/api'
 import { clearGuestId } from '../services/guest'
 import AuthModal from './AuthModal'
 
-export default function Header({ toggleSidebar, title, isGuest, guestId }) {
+export default function Header({ toggleSidebar, isGuest, guestId, title }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef(null);
+  const [menuStyle, setMenuStyle] = useState({});
 
-  // Dynamic Positioning Logic
-  const updateMenuPosition = () => {
-      if (buttonRef.current) {
+  // 1. Calculate Fixed Position (Solves "Hiding Behind Chat")
+  useEffect(() => {
+      if (isMenuOpen && buttonRef.current) {
           const rect = buttonRef.current.getBoundingClientRect();
-          setMenuPosition({
-              top: rect.bottom + 12, // Slightly below button
-              left: rect.left // Align left edge with button
+          setMenuStyle({
+              position: 'fixed', 
+              top: `${rect.bottom + 8}px`, // 8px gap below button
+              left: `${rect.left}px`,
+              zIndex: 9999 // Force on top
           });
       }
-  };
-
-  useEffect(() => {
-    if (isMenuOpen) {
-        updateMenuPosition();
-        window.addEventListener('resize', updateMenuPosition);
-        window.addEventListener('scroll', updateMenuPosition);
-    }
-    return () => {
-        window.removeEventListener('resize', updateMenuPosition);
-        window.removeEventListener('scroll', updateMenuPosition);
-    };
   }, [isMenuOpen]);
 
-  // Click Outside Logic
+  // Click Outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (isMenuOpen && !event.target.closest('.user-menu-fixed') && !event.target.closest('.user-profile-btn')) {
         setIsMenuOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", () => setIsMenuOpen(false), true); // Close on scroll
+    return () => {
+        window.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("scroll", () => setIsMenuOpen(false), true);
+    };
   }, [isMenuOpen]);
 
   const handleLogout = async () => {
-      try {
-          await logoutUser();
-          clearGuestId();
-          window.location.reload();
-      } catch(err) { console.error(err); }
-  };
-
-  const handleDeleteAccount = async () => {
-      if(confirm("⚠️ Delete Account?\nThis action is irreversible.")) {
-          try {
-            await deleteAccount(guestId);
-            clearGuestId();
-            window.location.reload();
-          } catch(err) { alert("Failed"); }
-      }
+      try { await logoutUser(); clearGuestId(); window.location.reload(); } catch(err) {}
   };
 
   return (
     <>
-    <div className="h-16 flex items-center justify-between px-4 sticky top-0 bg-[#f0f4f9]/95 backdrop-blur z-30 border-b border-gray-200/50">
-        <div className="flex items-center gap-3">
-            <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-200 md:hidden">
-                <Bars3Icon className="w-6 h-6 text-gray-600" />
+    {/* Transparent Header */}
+    <div className="h-16 flex items-center justify-between px-4 md:px-6 absolute top-0 w-full z-30 pointer-events-none bg-transparent">
+        
+        {/* LEFT: Sidebar Toggle & Profile */}
+        <div className="flex items-center gap-3 pointer-events-auto">
+            <button onClick={toggleSidebar} className="p-2 -ml-2 rounded-full hover:bg-gray-200/50 md:hidden text-gray-600">
+                <Bars3Icon className="w-6 h-6" />
             </button>
             
-            {/* PROFILE BUTTON MOVED TO LEFT WITH SIDEBAR TOGGLE (Based on your description) */}
+            {/* Profile Button */}
             <button 
                 ref={buttonRef}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="user-profile-btn flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 transition-colors border border-gray-200 overflow-hidden"
+                className="user-profile-btn flex items-center justify-center w-10 h-10 rounded-full hover:opacity-80 transition-opacity overflow-hidden ring-2 ring-white shadow-sm bg-white cursor-pointer"
             >
                 <img 
                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${isGuest ? 'Guest' : guestId}`} 
@@ -86,63 +69,63 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
             </button>
         </div>
 
-        <h1 className="text-lg font-medium text-gray-600 absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
-            {title || "Gemini Shopping"}
-        </h1>
-        
-        <div className="w-10"></div> 
+        {/* CENTER: Chat Title */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 pointer-events-auto">
+            {title && (
+                <div className="px-4 py-1.5 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
+                    <h1 className="text-sm font-medium text-gray-700 truncate max-w-[150px] md:max-w-[300px]">
+                        {title}
+                    </h1>
+                </div>
+            )}
+        </div>
+
+        {/* RIGHT: Logo */}
+        <div className="flex items-center pointer-events-auto">
+             <span className="text-xs font-bold text-gray-400 tracking-widest uppercase select-none">
+                AH Shopping Assistant
+            </span>
+        </div>
     </div>
 
-    {/* MENU DROPDOWN (Fixed Position) */}
+    {/* FIXED MENU DROPDOWN */}
     {isMenuOpen && (
         <div 
-            className="user-menu-fixed fixed w-[300px] bg-[#e9eef6] rounded-[24px] shadow-2xl border border-white/60 p-4 z-[9999] animate-in fade-in zoom-in-95 duration-200 origin-top-left"
-            style={{ 
-                top: `${menuPosition.top}px`, 
-                left: `${menuPosition.left}px`,
-                filter: 'drop-shadow(0px 10px 40px rgba(0,0,0,0.2))'
-            }}
+            className="user-menu-fixed w-[260px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 animate-in fade-in zoom-in-95 duration-200"
+            style={menuStyle}
         >
-            <button onClick={() => setIsMenuOpen(false)} className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200 text-gray-400">✕</button>
-
-            <div className="bg-white rounded-[20px] p-5 shadow-sm text-center mb-2">
-                <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mb-4">
-                    {isGuest ? 'Guest Mode' : 'Signed In'}
-                </p>
-                <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 overflow-hidden border-2 border-[#e9eef6]">
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${isGuest ? 'Guest' : guestId}`} alt="Avatar" />
-                </div>
-                <h3 className="text-base font-semibold text-gray-800 mb-0.5">{isGuest ? 'Guest User' : `Hi, Human!`}</h3>
-                <p className="text-xs text-gray-400 mb-5 break-all px-2">{isGuest ? 'History saves locally' : guestId}</p>
-                
-                {isGuest && (
-                    <button 
-                        onClick={() => { setIsMenuOpen(false); setAuthModalOpen(true); }}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors mb-3 shadow-md shadow-blue-200"
-                    >
-                        Sign In / Sign Up
-                    </button>
-                )}
-                
-                <div className="space-y-1">
-                    {!isGuest && (
-                        <button onClick={handleLogout} className="w-full bg-gray-50 hover:bg-gray-100 text-sm py-2.5 rounded-xl text-gray-700 transition-colors font-medium border border-gray-100">Sign Out</button>
-                    )}
-                    <button onClick={handleDeleteAccount} className="w-full bg-white hover:bg-red-50 text-sm py-2.5 rounded-xl text-red-600 transition-colors font-medium border border-transparent hover:border-red-100">Delete Account</button>
-                </div>
+            <div className="flex justify-between items-start mb-4">
+                 <div>
+                    <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mb-1">
+                        {isGuest ? 'Guest Mode' : 'Signed In'}
+                    </p>
+                    <h3 className="text-sm font-semibold text-gray-800">
+                        {isGuest ? 'Guest User' : `User`}
+                    </h3>
+                    {/* Guest ID Display */}
+                    <div className="mt-1 inline-block bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                        <p className="text-[10px] text-gray-500 font-mono break-all">
+                            ID: {guestId ? guestId.slice(0, 12) + "..." : "..."}
+                        </p>
+                    </div>
+                 </div>
+                 <button onClick={() => setIsMenuOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
             
-            <div className="flex justify-center gap-3 text-[10px] text-gray-400 mt-2">
-                <a href="#" className="hover:text-gray-600">Privacy</a><span>•</span><a href="#" className="hover:text-gray-600">Terms</a>
-            </div>
+            {isGuest ? (
+                <button 
+                    onClick={() => { setIsMenuOpen(false); setAuthModalOpen(true); }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-2.5 rounded-xl transition-colors shadow-md shadow-blue-200"
+                >
+                    Sign In / Sign Up
+                </button>
+            ) : (
+                <button onClick={handleLogout} className="w-full bg-gray-50 hover:bg-gray-100 text-xs py-2 rounded-lg text-gray-700 transition-colors font-medium border border-gray-100">Sign Out</button>
+            )}
         </div>
     )}
 
-    <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setAuthModalOpen(false)} 
-        onLoginSuccess={() => window.location.reload()} 
-    />
+    <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} onLoginSuccess={() => window.location.reload()} />
     </>
   )
 }

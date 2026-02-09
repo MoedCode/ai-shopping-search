@@ -108,15 +108,17 @@ class ChatView(APIView):
         new_guest = User.objects.create_guest()
         return new_guest, True
 
+# ai-shopping-search/backend/chat/views.py
+
     def post(self, request):
         """
         Handle incoming messages.
         - Creates/Retrieves Session.
-        - Saves User Message (with deduplication support via client_message_id).
+        - Saves User Message (with deduplication check).
         - Streams back the AI response.
         """
         content = request.data.get('message', '').strip()
-        client_message_id = request.data.get('client_message_id')
+        client_message_id = request.data.get('client_message_id') # Received from Frontend
         provided_session_id = request.data.get('session_id')
         
         if not content:
@@ -144,8 +146,7 @@ class ChatView(APIView):
             except ValueError:
                 pass # Invalid UUID string from frontend; ignore it.
 
-        # 4. Save User Message
-        # Note: We map 'client_message_id' (Frontend) to 'external_id' (Database)
+        # 4. Save User Message with Deduplication
         user_message_kwargs = {
             "session": session,
             "role": ChatMessage.Role.USER,
@@ -154,12 +155,15 @@ class ChatView(APIView):
         }
         
         if valid_external_id:
-            # Check for deduplication: If message already exists, don't create new one
-            # This is optional but good practice if frontend retries requests
+            # CHECK: If message with this ID exists, DO NOT CREATE IT AGAIN (Idempotency)
+            # This allows the frontend to 'Retry' without creating duplicate user messages.
             if not ChatMessage.objects.filter(external_id=valid_external_id).exists():
                  user_message_kwargs["external_id"] = valid_external_id
                  ChatMessage.objects.create(**user_message_kwargs)
+            else:
+                 print(f"DEBUG: Skipping duplicate message creation for {valid_external_id}")
         else:
+            # Fallback for old requests without IDs
             ChatMessage.objects.create(**user_message_kwargs)
         
         # Update session timestamp
@@ -208,7 +212,7 @@ class ChatView(APIView):
                             continue
                 
                 # 6. Save Assistant Response to DB
-                # Only save if we got something back
+                # Critical: This saves the data so your 'Refetch' on the frontend works
                 if full_agent_answer or collected_hits:
                     ChatMessage.objects.create(
                         session=session,
@@ -222,6 +226,7 @@ class ChatView(APIView):
                 session.last_message_at = timezone.now()
                 session.save(update_fields=['last_message_at'])
                 debug_log_agent_response(session.id, full_agent_answer, collected_hits)
+
             except Exception as e:
                 # Handle Stream Interruptions
                 error_data = {"type": "error", "message": "connection interrupted"}
@@ -254,14 +259,28 @@ class ChatView(APIView):
             session.save()
             return Response({"message": "Session title updated", "data": session_title}, status=200)
         return Response({"message": "No title provided"}, status=400)
-
     def delete(self, request):
-        """Delete a Session"""
-        found, session = self.get_session(request)
-        if not found:
-            return Response({"error": session}, status=404)
-        session.delete()
-        return Response({"message": "Session deleted"}, status=200)
+            """Delete a Session OR a specific Message"""
+            user, _ = self.get_user(request)
+            
+            # Check if we are deleting a specific message
+            message_id = request.data.get('message_id') or request.query_params.get('message_id')
+            
+            if message_id:
+                try:
+                    # Ensure the message belongs to a session owned by the user
+                    msg = ChatMessage.objects.get(id=message_id, session__user=user)
+                    msg.delete()
+                    return Response({"message": "Message deleted"}, status=200)
+                except (ChatMessage.DoesNotExist, ValidationError): # <--- Catch Validation Error here
+                    return Response({"error": "Message not found or invalid ID"}, status=404)
+
+            # Otherwise, delete the whole session
+            found, session = self.get_session(request)
+            if not found:
+                return Response({"error": session}, status=404)
+            session.delete()
+            return Response({"message": "Session deleted"}, status=200)
 
     def get_session(self, request):
         """Internal helper to fetch session"""

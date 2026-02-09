@@ -6,7 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const client = axios.create({ baseURL: API_URL })
 
-// Add Guest ID and Auth Token (if exists) to every request
+// Add Guest ID header to every request
 client.interceptors.request.use(async (cfg) => {
   const guestId = await getGuestId()
   if (guestId) cfg.headers['X-Guest-Id'] = guestId
@@ -16,11 +16,12 @@ client.interceptors.request.use(async (cfg) => {
 // --- Endpoints ---
 const CHAT_ENDPOINT = '/chat/session'
 const SAVED_ENDPOINT = '/chat/saved-products'
-const AUTH_ENDPOINT = '/accounts/auth' // Unified auth (Standard/Guest)
-const SOCIAL_GOOGLE_ENDPOINT = '/accounts/google/' // Dedicated Google endpoint
+const AUTH_ENDPOINT = '/accounts/auth'
+const SOCIAL_GOOGLE_ENDPOINT = '/accounts/google/'
 const LOGOUT_ENDPOINT = '/accounts/logout'
 
 // --- Chat & Session APIs ---
+
 export const fetchUserSessions = async (guestId) => {
   return client.get(CHAT_ENDPOINT, { params: { guest_id: guestId } })
 }
@@ -37,30 +38,28 @@ export const deleteSession = async (guestId, sessionId) => {
     return client.delete(CHAT_ENDPOINT, { data: { guest_id: guestId, session_id: sessionId } })
 }
 
+// FIX: Renamed 'title' to 'session_title' to match backend expectation
 export const renameSession = async (guestId, sessionId, newTitle) => {
     return client.patch(CHAT_ENDPOINT, { 
         guest_id: guestId, 
-        session_id: sessionId,
-        title: newTitle 
+        session_id: sessionId, 
+        session_title: newTitle 
     })
 }
 
+// FIX: Use Query Params for Delete Message to prevent 404/Body parsing issues
+export const deleteMessage = async (guestId, messageId) => {
+    return client.delete(`${CHAT_ENDPOINT}?message_id=${messageId}&guest_id=${guestId}`)
+}
+
 // --- My Stuff (Saved Products) ---
-export const saveProduct = async (productData) => {
-    return client.post(SAVED_ENDPOINT, productData)
-}
 
-export const getSavedProducts = async () => {
-    return client.get(SAVED_ENDPOINT)
-}
+export const saveProduct = async (productData) => client.post(SAVED_ENDPOINT, productData)
+export const getSavedProducts = async () => client.get(SAVED_ENDPOINT)
+export const removeSavedProduct = async (dbId) => client.delete(SAVED_ENDPOINT, { data: { id: dbId } })
 
-export const removeSavedProduct = async (dbId) => {
-    return client.delete(SAVED_ENDPOINT, { data: { id: dbId } })
-}
+// --- Authentication APIs (Restored) ---
 
-// --- Authentication APIs ---
-
-// 1. Standard Login (Username/Email + Password)
 export const authenticateUser = async (email, password, guestId) => {
     return client.post(AUTH_ENDPOINT, { 
         email, 
@@ -69,7 +68,6 @@ export const authenticateUser = async (email, password, guestId) => {
     });
 }
 
-// 2. Social Login (Sends Google Token to Backend)
 export const socialLogin = async (provider, accessToken) => {
     // Dynamically select endpoint based on provider
     const endpoint = provider === 'google' ? SOCIAL_GOOGLE_ENDPOINT : `/accounts/${provider}/`;
@@ -78,10 +76,6 @@ export const socialLogin = async (provider, accessToken) => {
     return client.post(endpoint, { 
         access_token: accessToken 
     });
-}
-
-export const getUserProfile = async () => {
-    return client.get(AUTH_ENDPOINT);
 }
 
 export const logoutUser = async () => {
