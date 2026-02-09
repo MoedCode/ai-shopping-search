@@ -6,16 +6,21 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 const client = axios.create({ baseURL: API_URL })
 
+// Add Guest ID and Auth Token (if exists) to every request
 client.interceptors.request.use(async (cfg) => {
   const guestId = await getGuestId()
   if (guestId) cfg.headers['X-Guest-Id'] = guestId
   return cfg
 })
 
-const CHAT_ENDPOINT = '/chat/session' // تم تصحيح المسار ليتوافق مع urls.py
+// --- Endpoints ---
+const CHAT_ENDPOINT = '/chat/session'
 const SAVED_ENDPOINT = '/chat/saved-products'
+const AUTH_ENDPOINT = '/accounts/auth' // Unified auth (Standard/Guest)
+const SOCIAL_GOOGLE_ENDPOINT = '/accounts/google/' // Dedicated Google endpoint
+const LOGOUT_ENDPOINT = '/accounts/logout'
 
-// --- Sessions ---
+// --- Chat & Session APIs ---
 export const fetchUserSessions = async (guestId) => {
   return client.get(CHAT_ENDPOINT, { params: { guest_id: guestId } })
 }
@@ -53,16 +58,25 @@ export const removeSavedProduct = async (dbId) => {
     return client.delete(SAVED_ENDPOINT, { data: { id: dbId } })
 }
 
-export default client
-const AUTH_ENDPOINT = '/accounts/auth';
-const LOGOUT_ENDPOINT = '/accounts/logout';
+// --- Authentication APIs ---
 
-// الدالة السحرية: تقوم بالتسجيل أو الدخول أو الدمج بناءً على الحالة
+// 1. Standard Login (Username/Email + Password)
 export const authenticateUser = async (email, password, guestId) => {
     return client.post(AUTH_ENDPOINT, { 
         email, 
         password, 
-        guest_id: guestId // نرسل معرف الزائر لدمج البيانات
+        guest_id: guestId 
+    });
+}
+
+// 2. Social Login (Sends Google Token to Backend)
+export const socialLogin = async (provider, accessToken) => {
+    // Dynamically select endpoint based on provider
+    const endpoint = provider === 'google' ? SOCIAL_GOOGLE_ENDPOINT : `/accounts/${provider}/`;
+    
+    // dj-rest-auth expects 'access_token' in the body
+    return client.post(endpoint, { 
+        access_token: accessToken 
     });
 }
 
@@ -75,6 +89,7 @@ export const logoutUser = async () => {
 }
 
 export const deleteAccount = async (guestId) => {
-    // نرسل guestId احتياطياً، لكن الباكند سيعتمد على التوثيق أولاً
     return client.delete(AUTH_ENDPOINT, { data: { guest_id: guestId } });
 }
+
+export default client

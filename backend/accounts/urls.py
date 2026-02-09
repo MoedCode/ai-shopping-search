@@ -1,11 +1,11 @@
-#ai-shopping-search/backend/accounts/urls.py
-from django.urls import path
+from django.urls import path, include
 from .views import AuthView, LogoutView
 
 urlpatterns = [
-    # رابط واحد موحد للعمليات الرئيسية (Get, Post, Patch, Delete)
     path('auth', AuthView.as_view(), name='auth-actions'),
-    
-    # رابط خاص لتسجيل الخروج
     path('logout', LogoutView.as_view(), name='logout'),
+    
+    # This enables the /accounts/google/login/ endpoints etc.
+    # It requires 'allauth.urls' to be included if you installed django-allauth
+    path('', include('allauth.urls')), 
 ]

@@ -9,16 +9,16 @@ import AuthModal from './AuthModal'
 export default function Header({ toggleSidebar, title, isGuest, guestId }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // نستخدم left بدلاً من right
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef(null);
 
-  // تحديث مكان القائمة بناءً على مكان الزر
+  // Dynamic Positioning Logic
   const updateMenuPosition = () => {
       if (buttonRef.current) {
           const rect = buttonRef.current.getBoundingClientRect();
           setMenuPosition({
-              top: rect.bottom + 10, // أسفل الزر بـ 10px
-              left: rect.left // محاذاة لليسار مع الزر
+              top: rect.bottom + 12, // Slightly below button
+              left: rect.left // Align left edge with button
           });
       }
   };
@@ -35,7 +35,7 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
     };
   }, [isMenuOpen]);
 
-  // إغلاق القائمة عند النقر خارجها
+  // Click Outside Logic
   useEffect(() => {
     function handleClickOutside(event) {
       if (isMenuOpen && !event.target.closest('.user-menu-fixed') && !event.target.closest('.user-profile-btn')) {
@@ -51,9 +51,7 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
           await logoutUser();
           clearGuestId();
           window.location.reload();
-      } catch(err) {
-          console.error("Logout failed", err);
-      }
+      } catch(err) { console.error(err); }
   };
 
   const handleDeleteAccount = async () => {
@@ -62,9 +60,7 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
             await deleteAccount(guestId);
             clearGuestId();
             window.location.reload();
-          } catch(err) {
-              alert("Failed to delete account");
-          }
+          } catch(err) { alert("Failed"); }
       }
   };
 
@@ -76,7 +72,7 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
                 <Bars3Icon className="w-6 h-6 text-gray-600" />
             </button>
             
-            {/* User Profile Button - Moved here as per your image */}
+            {/* PROFILE BUTTON MOVED TO LEFT WITH SIDEBAR TOGGLE (Based on your description) */}
             <button 
                 ref={buttonRef}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -94,39 +90,29 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
             {title || "Gemini Shopping"}
         </h1>
         
-        <div className="w-10"></div> {/* Spacer to center title */}
+        <div className="w-10"></div> 
     </div>
 
-    {/* === القائمة العائمة (Fixed + Dynamic Position) === */}
+    {/* MENU DROPDOWN (Fixed Position) */}
     {isMenuOpen && (
         <div 
-            className="user-menu-fixed fixed w-[300px] bg-[#e9eef6] rounded-[24px] shadow-2xl border border-white/60 p-4 z-[9999] animate-in fade-in zoom-in-95 duration-200"
+            className="user-menu-fixed fixed w-[300px] bg-[#e9eef6] rounded-[24px] shadow-2xl border border-white/60 p-4 z-[9999] animate-in fade-in zoom-in-95 duration-200 origin-top-left"
             style={{ 
                 top: `${menuPosition.top}px`, 
                 left: `${menuPosition.left}px`,
                 filter: 'drop-shadow(0px 10px 40px rgba(0,0,0,0.2))'
             }}
         >
-            {/* زر إغلاق */}
-            <button 
-                onClick={() => setIsMenuOpen(false)}
-                className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200 text-gray-400"
-            >
-                ✕
-            </button>
+            <button onClick={() => setIsMenuOpen(false)} className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200 text-gray-400">✕</button>
 
             <div className="bg-white rounded-[20px] p-5 shadow-sm text-center mb-2">
                 <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mb-4">
                     {isGuest ? 'Guest Mode' : 'Signed In'}
                 </p>
-                
                 <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 overflow-hidden border-2 border-[#e9eef6]">
                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${isGuest ? 'Guest' : guestId}`} alt="Avatar" />
                 </div>
-                
-                <h3 className="text-base font-semibold text-gray-800 mb-0.5">
-                    {isGuest ? 'Guest User' : `Hi, ${guestId?.split('-')[0]}!`}
-                </h3>
+                <h3 className="text-base font-semibold text-gray-800 mb-0.5">{isGuest ? 'Guest User' : `Hi, Human!`}</h3>
                 <p className="text-xs text-gray-400 mb-5 break-all px-2">{isGuest ? 'History saves locally' : guestId}</p>
                 
                 {isGuest && (
@@ -140,34 +126,22 @@ export default function Header({ toggleSidebar, title, isGuest, guestId }) {
                 
                 <div className="space-y-1">
                     {!isGuest && (
-                        <button 
-                            onClick={handleLogout}
-                            className="w-full bg-gray-50 hover:bg-gray-100 text-sm py-2.5 rounded-xl text-gray-700 transition-colors font-medium border border-gray-100"
-                        >
-                            Sign Out
-                        </button>
+                        <button onClick={handleLogout} className="w-full bg-gray-50 hover:bg-gray-100 text-sm py-2.5 rounded-xl text-gray-700 transition-colors font-medium border border-gray-100">Sign Out</button>
                     )}
-                    <button 
-                        onClick={handleDeleteAccount}
-                        className="w-full bg-white hover:bg-red-50 text-sm py-2.5 rounded-xl text-red-600 transition-colors font-medium border border-transparent hover:border-red-100"
-                    >
-                        Delete Account
-                    </button>
+                    <button onClick={handleDeleteAccount} className="w-full bg-white hover:bg-red-50 text-sm py-2.5 rounded-xl text-red-600 transition-colors font-medium border border-transparent hover:border-red-100">Delete Account</button>
                 </div>
             </div>
-
+            
             <div className="flex justify-center gap-3 text-[10px] text-gray-400 mt-2">
-                <a href="#" className="hover:text-gray-600">Privacy</a>
-                <span>•</span>
-                <a href="#" className="hover:text-gray-600">Terms</a>
+                <a href="#" className="hover:text-gray-600">Privacy</a><span>•</span><a href="#" className="hover:text-gray-600">Terms</a>
             </div>
         </div>
     )}
 
     <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setAuthModalOpen(false)}
-        onLoginSuccess={() => window.location.reload()}
+        onClose={() => setAuthModalOpen(false)} 
+        onLoginSuccess={() => window.location.reload()} 
     />
     </>
   )
